@@ -40,9 +40,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             startActivity(intent);
 
         } else if (id == R.id.nav_gallery) {
-            // TODO: 3/30/16 add Share Activity
             Log.i(TAG, "onNavigationItemSelected: Đã chọn activity ShareActivity");
-
+            Log.i(TAG, "onNavigationItemSelected: Đã chọn activity MainActivity");
+            Intent intent = new Intent(this, ShareActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_slideshow) {
 
