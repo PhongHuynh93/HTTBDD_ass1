@@ -68,6 +68,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
             mIMapController.setCenter(startPoint);
         }
 
+        // Phong - when click fab, zoom to user's location
         FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab_my_location);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
