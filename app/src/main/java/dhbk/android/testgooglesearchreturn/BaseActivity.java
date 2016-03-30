@@ -22,7 +22,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         super.onPostCreate(savedInstanceState);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         if (navigationView != null) {
-            navigationView.setNavigationItemSelectedListener(thi
+            navigationView.setNavigationItemSelectedListener(this);
+        }
+    }
+
     // TODO: 3/30/16 Hiếu: fix lại nội dung navigation drawer
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
