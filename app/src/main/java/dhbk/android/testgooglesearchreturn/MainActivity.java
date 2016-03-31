@@ -56,6 +56,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     private BottomSheetBehavior mBottomSheetBehavior;
     private FrameLayout mBottomSheetDetailPlace;
     private TextView mPlaceName;
+    private TextView mAddressName;
+    private TextView mPhoneName;
+    private TextView mWebsiteName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +83,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 
     private void declareBottomSheet() {
         mPlaceName = (TextView) findViewById(R.id.place_name);
+        mAddressName = (TextView) findViewById(R.id.address_name);
+        mPhoneName = (TextView) findViewById(R.id.phone_name);
+        mWebsiteName = (TextView) findViewById(R.id.website_name);
         mBottomSheetDetailPlace = (FrameLayout) findViewById(R.id.map_bottom_sheets);
         mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheetDetailPlace);
 
@@ -107,7 +113,18 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 //                    mPlaceAttribution.setText("");
 //                }
                 if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                    mPlaceName.setText(place.getName());
+                    if (place.getName() != null) {
+                        mPlaceName.setText(place.getName());
+                    }
+                    if (place.getAddress() != null) {
+                        mAddressName.setText(place.getAddress());
+                    }
+                    if (place.getPhoneNumber() != null) {
+                        mPhoneName.setText(place.getPhoneNumber());
+                    }
+                    if (place.getWebsiteUri() != null) {
+                        mWebsiteName.setText(place.getWebsiteUri() + "");
+                    }
                     mBottomSheetBehavior.setPeekHeight(369);
                     mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
