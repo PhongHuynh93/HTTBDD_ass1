@@ -21,10 +21,6 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"/>
 
-        <ImageView
-            android:id="@+id/img"
-            android:layout_width="150dp"
-            android:layout_height="150dp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/camera"
