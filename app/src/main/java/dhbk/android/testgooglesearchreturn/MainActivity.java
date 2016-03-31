@@ -50,8 +50,6 @@ import org.osmdroid.views.MapView;
 
 public class MainActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "MainApp";
-    private MapView mMapView;
-    private IMapController mIMapController;
     //    declare bottom sheet
     private BottomSheetBehavior mBottomSheetBehavior;
     private FrameLayout mBottomSheetDetailPlace;
@@ -67,12 +65,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 
         // TODO: 3/30/16 Hiếu - khi mở, app sẽ xét xem mình có mở GPS chưa, nếu chưa thì app sẽ hiện 1 hộp thoại "Dialog" yêu cầu người dùng mở GPS, ông sẽ hiện thực hộp thoại này
 
-        // Phong - show the map + add 2 zoom button + zoom at a default view point
-        makeMapDefaultSetting();
-
         // Phong - when click fab, zoom to user's location
         declareFAB();
-
 
         // search view
         declareSearchView();
@@ -128,6 +122,12 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                     mBottomSheetBehavior.setPeekHeight(369);
                     mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
+
+                // center at that point
+                Location placeLocation = new Location("Test");
+                placeLocation.setLatitude(place.getLatLng().latitude);
+                placeLocation.setLongitude(place.getLatLng().longitude);
+                setMarkerAtLocation(placeLocation, R.drawable.ic_face_black_24dp);
             }
 
             @Override
@@ -161,20 +161,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                         return;
                     }
                     Location userCurrentLocation = getLocation();
-                    if (userCurrentLocation != null) {
-                        GeoPoint userCurrentPoint = new GeoPoint(userCurrentLocation.getLatitude(), userCurrentLocation.getLongitude());
-                        mIMapController.setCenter(userCurrentPoint);
-                        mIMapController.zoomTo(mMapView.getMaxZoomLevel());
-                        Marker hereMarker = new Marker(mMapView);
-                        hereMarker.setPosition(userCurrentPoint);
-                        hereMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                        hereMarker.setIcon(ContextCompat.getDrawable(getApplication(), R.drawable.ic_face_black_24dp));
-                        hereMarker.setTitle("You here");
-                        mMapView.getOverlays().add(hereMarker);
-                        mMapView.invalidate();
-                    } else {
-                        Log.i(TAG, "onClick: Not determine your current location");
-                    }
+                    setMarkerAtLocation(userCurrentLocation, R.drawable.ic_face_black_24dp);
                 } else {
                     Log.i(TAG, "onClick: GoogleApi not connect");
                 }
@@ -182,16 +169,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
         });
     }
 
-    private void makeMapDefaultSetting() {
-        mMapView = (MapView) findViewById(R.id.map); // map
-        if (mMapView != null) {
-            mMapView.setTileSource(TileSourceFactory.MAPNIK);
-            mMapView.setMultiTouchControls(true);
-            mIMapController = mMapView.getController(); // map controller
-            mIMapController.setZoom(10);
-            GeoPoint startPoint = new GeoPoint(10.772241, 106.657676);
-            mIMapController.setCenter(startPoint);
-        }
-    }
+
 
 }
