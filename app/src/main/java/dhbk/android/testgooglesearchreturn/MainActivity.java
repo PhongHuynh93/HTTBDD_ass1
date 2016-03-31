@@ -49,7 +49,6 @@ import org.osmdroid.views.MapView;
 
 public class MainActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "MainApp";
-    private GoogleApiClient mGoogleApiClient;
     private MapView mMapView;
     private IMapController mIMapController;
 //    declare bottom sheet
@@ -70,8 +69,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
         // Phong - when click fab, zoom to user's location
         declareFAB();
 
-        // connect to google api
-        buildGoogleApiClient();
+
 
         // search view
         declareSearchView();
@@ -129,26 +127,18 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
         });
     }
 
-    private void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient
-                .Builder(this)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .addApi(LocationServices.API)
-                .enableAutoManage(this, this)
-                .build();
-    }
+
 
     private void declareFAB() {
         FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab_my_location);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mGoogleApiClient.isConnected()) {
+                if (isGoogleConnected()) {
                     if (ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         return;
                     }
-                    Location userCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                    Location userCurrentLocation = getLocation();
                     if (userCurrentLocation != null) {
                         GeoPoint userCurrentPoint = new GeoPoint(userCurrentLocation.getLatitude(), userCurrentLocation.getLongitude());
                         mIMapController.setCenter(userCurrentPoint);
@@ -181,11 +171,5 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
             mIMapController.setCenter(startPoint);
         }
     }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-
 
 }
