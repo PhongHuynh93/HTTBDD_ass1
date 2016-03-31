@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,8 +53,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     private MapView mMapView;
     private IMapController mIMapController;
 //    declare bottom sheet
-    private BottomSheetBehavior bottomSheetBehavior;
-    private TextView bottomSheetDetailPlace;
+    private BottomSheetBehavior mBottomSheetBehavior;
+    private FrameLayout mBottomSheetDetailPlace;
+    private TextView mPlaceName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +81,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     }
 
     private void declareBottomSheet() {
-        bottomSheetDetailPlace = (TextView) findViewById(R.id.map_bottom_sheets);
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetDetailPlace);
+        mPlaceName = (TextView) findViewById(R.id.place_name);
+        mBottomSheetDetailPlace = (FrameLayout) findViewById(R.id.map_bottom_sheets);
+        mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheetDetailPlace);
 
     }
 
@@ -104,10 +107,14 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 //                } else {
 //                    mPlaceAttribution.setText("");
 //                }
-                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                    bottomSheetDetailPlace.setText(place.getName());
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                    mPlaceName.setText(place.getName());
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                } else if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                    mPlaceName.setText(place.getName());
                 }
+
+
             }
 
             @Override
