@@ -8,6 +8,8 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -49,6 +51,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     private GoogleApiClient mGoogleApiClient;
     private MapView mMapView;
     private IMapController mIMapController;
+//    declare bottom sheet
+    private BottomSheetBehavior bottomSheetBehavior;
+    private TextView bottomSheetDetailPlace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,17 +63,73 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
         // TODO: 3/30/16 Hiếu - khi mở, app sẽ xét xem mình có mở GPS chưa, nếu chưa thì app sẽ hiện 1 hộp thoại "Dialog" yêu cầu người dùng mở GPS, ông sẽ hiện thực hộp thoại này
 
         // Phong - show the map + add 2 zoom button + zoom at a default view point
-        mMapView = (MapView) findViewById(R.id.map); // map
-        if (mMapView != null) {
-            mMapView.setTileSource(TileSourceFactory.MAPNIK);
-            mMapView.setMultiTouchControls(true);
-            mIMapController = mMapView.getController(); // map controller
-            mIMapController.setZoom(10);
-            GeoPoint startPoint = new GeoPoint(10.772241, 106.657676);
-            mIMapController.setCenter(startPoint);
-        }
+        makeMapDefaultSetting();
 
         // Phong - when click fab, zoom to user's location
+        declareFAB();
+
+        // connect to google api
+        buildGoogleApiClient();
+
+        // search view
+        declareSearchView();
+
+        // bottom sheet
+        declareBottomSheet();
+    }
+
+    private void declareBottomSheet() {
+        bottomSheetDetailPlace = (TextView) findViewById(R.id.map_bottom_sheets);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetDetailPlace);
+
+    }
+
+    private void declareSearchView() {
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+
+            // khi return search place, make bottom sheets appear and set place details to it.
+            @Override
+            public void onPlaceSelected(Place place) {
+                Log.i(TAG, "Place Selected: " + place.getName());
+
+                // Format the returned place's details and display them in the TextView.
+//                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(), place.getId(),
+//                        place.getAddress(), place.getPhoneNumber(), place.getWebsiteUri()));
+
+//                CharSequence attributions = place.getAttributions();
+//                if (!TextUtils.isEmpty(attributions)) {
+//                    mPlaceAttribution.setText(Html.fromHtml(attributions.toString()));
+//                } else {
+//                    mPlaceAttribution.setText("");
+//                }
+                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                    bottomSheetDetailPlace.setText(place.getName());
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
+            }
+
+            @Override
+            public void onError(Status status) {
+                Log.e(TAG, "onError: Status = " + status.toString());
+                Toast.makeText(getApplication(), "Place selection failed: " + status.getStatusMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .addApi(LocationServices.API)
+                .enableAutoManage(this, this)
+                .build();
+    }
+
+    private void declareFAB() {
         FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab_my_location);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,43 +158,18 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                 }
             }
         });
+    }
 
-        // connect to google api
-        mGoogleApiClient = new GoogleApiClient
-                .Builder(this)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .addApi(LocationServices.API)
-                .enableAutoManage(this, this)
-                .build();
-
-        // search view
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(Place place) {
-                Log.i(TAG, "Place Selected: " + place.getName());
-
-                // Format the returned place's details and display them in the TextView.
-//                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(), place.getId(),
-//                        place.getAddress(), place.getPhoneNumber(), place.getWebsiteUri()));
-
-//                CharSequence attributions = place.getAttributions();
-//                if (!TextUtils.isEmpty(attributions)) {
-//                    mPlaceAttribution.setText(Html.fromHtml(attributions.toString()));
-//                } else {
-//                    mPlaceAttribution.setText("");
-//                }
-            }
-
-            @Override
-            public void onError(Status status) {
-                Log.e(TAG, "onError: Status = " + status.toString());
-                Toast.makeText(getApplication(), "Place selection failed: " + status.getStatusMessage(),
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void makeMapDefaultSetting() {
+        mMapView = (MapView) findViewById(R.id.map); // map
+        if (mMapView != null) {
+            mMapView.setTileSource(TileSourceFactory.MAPNIK);
+            mMapView.setMultiTouchControls(true);
+            mIMapController = mMapView.getController(); // map controller
+            mIMapController.setZoom(10);
+            GeoPoint startPoint = new GeoPoint(10.772241, 106.657676);
+            mIMapController.setCenter(startPoint);
+        }
     }
 
     @Override
