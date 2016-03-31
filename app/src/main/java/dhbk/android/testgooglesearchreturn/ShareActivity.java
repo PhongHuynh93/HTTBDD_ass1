@@ -34,8 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Date;
 
 
@@ -43,7 +41,9 @@ public class ShareActivity extends AppCompatActivity {
 
 
     private static final int ACTIVITY_CAMERA_APP = 0;
-    private static final String GALLERY_LOCATION = "tripGallery" + new SimpleDateFormat("ydM_Hms").format(new Date()); // name of the folder gallery
+    // private static final String GALLERY_LOCATION = "tripGallery" + new SimpleDateFormat("ydM_Hms").format(new Date()); // name of the folder gallery
+    //TODO: Nhân - đặt tên folder gallery hợp lí
+    private static final String GALLERY_LOCATION = "tripGallery2016313_232723";
     LocationManager locationManager;
     RoadManager roadManager = new OSRMRoadManager(this);
     ArrayList<GeoPoint> route;
@@ -52,7 +52,7 @@ public class ShareActivity extends AppCompatActivity {
     LocationListener locationListenerGPS, locationListenerNetWork;
     private IMapController mapController;
     private ImageView img;
-    //private RecyclerView recyclerView;
+
     private String imageFileLocation = "";
     private File galleryFoler;
 
@@ -72,11 +72,6 @@ public class ShareActivity extends AppCompatActivity {
         setContentView(R.layout.activity_share);
         /*Gallery*/
         createImageGallery(); //create gallery when onCreate
-//        recyclerView=(RecyclerView) findViewById(R.id.imgRecycleView);
-//        RecyclerView.LayoutManager layoutManager=new GridLayoutManager(this,1);
-//        recyclerView.setLayoutManager(layoutManager);
-//        RecyclerView.Adapter imageAdapter=new ListAdapter(sortFile(galleryFoler));
-//        recyclerView.setAdapter(imageAdapter);
         /*Map*/
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
@@ -188,12 +183,6 @@ public class ShareActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (requestCode == ACTIVITY_CAMERA_APP && resultCode == RESULT_OK) {
             Toast.makeText(this, "Image Saved", Toast.LENGTH_SHORT).show();
-//            Bundle bundle=intent.getExtras();
-//            Bitmap bmp= (Bitmap) bundle.get("data");
-//            img.setImageBitmap(bmp);
-
-//            Bitmap photoCaptured= BitmapFactory.decodeFile(imageFileLocation);
-//            img.setImageBitmap(photoCaptured);
             addPicToGallery(this, imageFileLocation);
 
             //setReductImageSize();
@@ -240,16 +229,13 @@ public class ShareActivity extends AppCompatActivity {
         img.setImageBitmap(bmp);
     }
 
-    //sorting function
-    private File[] sortFile(File fileImageDir) {
-        File[] files = fileImageDir.listFiles();
-        Arrays.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File lhs, File rhs) {
-                return Long.valueOf(rhs.lastModified()).compareTo(Long.valueOf(lhs.lastModified()));
-            }
-        });
-        return files;
+    public void startGalleryActivity(View v) {
+        Intent intent = new Intent(this, ListTripActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("galleryLocation", GALLERY_LOCATION);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
+
 
 }
