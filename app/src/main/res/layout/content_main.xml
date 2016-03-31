@@ -45,14 +45,15 @@
             android:layout_marginTop="28dp"
             android:background="@android:color/white"
             android:orientation="vertical"
-            android:paddingTop="@dimen/activity_horizontal_margin">
+            android:paddingTop="@dimen/activity_horizontal_margin"
+            android:paddingBottom="@dimen/activity_horizontal_margin">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingLeft="56dp"
-                android:paddingStart="56dp">
+                android:paddingRight="56dp">
 
                 <TextView
                     style="@style/TextAppearance.AppCompat.Headline"

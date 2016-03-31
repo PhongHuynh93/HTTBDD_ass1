@@ -96,6 +96,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
             @Override
             public void onPlaceSelected(Place place) {
                 Log.i(TAG, "Place Selected: " + place.getName());
+                Log.i(TAG, "Place Selected: " + place.getAddress());
+                Log.i(TAG, "Place Selected: " + place.getPhoneNumber());
+                Log.i(TAG, "Place Selected: " + place.getWebsiteUri());
 
                 // Format the returned place's details and display them in the TextView.
 //                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(), place.getId(),
