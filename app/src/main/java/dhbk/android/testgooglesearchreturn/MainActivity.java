@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,7 +52,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     private static final String TAG = "MainApp";
     private MapView mMapView;
     private IMapController mIMapController;
-//    declare bottom sheet
+    //    declare bottom sheet
     private BottomSheetBehavior mBottomSheetBehavior;
     private FrameLayout mBottomSheetDetailPlace;
     private TextView mPlaceName;
@@ -70,7 +71,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
         declareFAB();
 
 
-
         // search view
         declareSearchView();
 
@@ -86,10 +86,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     }
 
     private void declareSearchView() {
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+        final PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-
             // khi return search place, make bottom sheets appear and set place details to it.
             @Override
             public void onPlaceSelected(Place place) {
@@ -97,7 +96,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                 Log.i(TAG, "Place Selected: " + place.getAddress());
                 Log.i(TAG, "Place Selected: " + place.getPhoneNumber());
                 Log.i(TAG, "Place Selected: " + place.getWebsiteUri());
-
                 // Format the returned place's details and display them in the TextView.
 //                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(), place.getId(),
 //                        place.getAddress(), place.getPhoneNumber(), place.getWebsiteUri()));
@@ -110,12 +108,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 //                }
                 if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
                     mPlaceName.setText(place.getName());
-                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                } else if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-                    mPlaceName.setText(place.getName());
+                    mBottomSheetBehavior.setPeekHeight(369);
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
-
-
             }
 
             @Override
@@ -125,8 +120,18 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                         Toast.LENGTH_SHORT).show();
             }
         });
-    }
 
+        // when click delete button, collapse bottom sheets (peekHeight = 0)
+        autocompleteFragment.getView().findViewById(R.id.place_autocomplete_clear_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((EditText) autocompleteFragment.getView().findViewById(R.id.place_autocomplete_search_input)).setText("");
+                view.setVisibility(View.GONE);
+                mBottomSheetBehavior.setPeekHeight(0);
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
+    }
 
 
     private void declareFAB() {
