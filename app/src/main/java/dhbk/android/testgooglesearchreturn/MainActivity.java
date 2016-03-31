@@ -57,12 +57,16 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     private TextView mAddressName;
     private TextView mPhoneName;
     private TextView mWebsiteName;
+    private MapView mMapView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Phong - show the map + add 2 zoom button + zoom at a default view point
+        makeMapDefaultSetting();
+        mMapView = getMapView();
         // TODO: 3/30/16 Hiếu - khi mở, app sẽ xét xem mình có mở GPS chưa, nếu chưa thì app sẽ hiện 1 hộp thoại "Dialog" yêu cầu người dùng mở GPS, ông sẽ hiện thực hộp thoại này
 
         // Phong - when click fab, zoom to user's location
@@ -123,7 +127,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                     mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
 
-                // center at that point
+                // remove marker on the map, center at that point and add marker.
+                mMapView.getOverlays().clear();
                 Location placeLocation = new Location("Test");
                 placeLocation.setLatitude(place.getLatLng().latitude);
                 placeLocation.setLongitude(place.getLatLng().longitude);
@@ -160,6 +165,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                     if (ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         return;
                     }
+                    // when click, remove old maker, add new marker
+                    mMapView.getOverlays().clear();
+
                     Location userCurrentLocation = getLocation();
                     setMarkerAtLocation(userCurrentLocation, R.drawable.ic_face_black_24dp);
                 } else {
@@ -168,7 +176,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
             }
         });
     }
-
 
 
 }

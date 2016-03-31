@@ -54,9 +54,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         }
         // connect to google api
         buildGoogleApiClient();
-
-        // Phong - show the map + add 2 zoom button + zoom at a default view point
-        makeMapDefaultSetting();
     }
 
     private void buildGoogleApiClient() {
@@ -137,7 +134,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     }
 
     // phong - make default map when opening the activity.
-    private void makeMapDefaultSetting() {
+    public void makeMapDefaultSetting() {
         mMapView = (MapView) findViewById(R.id.map); // map
         if (mMapView != null) {
             mMapView.setTileSource(TileSourceFactory.MAPNIK);

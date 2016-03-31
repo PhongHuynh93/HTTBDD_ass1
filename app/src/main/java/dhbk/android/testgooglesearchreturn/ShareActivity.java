@@ -29,7 +29,7 @@ public class ShareActivity extends BaseActivity {
     RoadManager roadManager = new OSRMRoadManager(this);
     ArrayList<GeoPoint> route;
     Marker mStart, mEnd;
-    MapView map;
+    MapView mMap;
     LocationListener locationListenerGPS, locationListenerNetWork;
     private IMapController mapController;
 
@@ -39,8 +39,8 @@ public class ShareActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share);
 
-        map = getMapView();
-        mapController = getIMapController();
+        makeMapDefaultSetting();
+        mMap = getMapView();
 //
 //        map = (MapView) findViewById(R.id.map);
 //        map.setTileSource(TileSourceFactory.MAPNIK);
