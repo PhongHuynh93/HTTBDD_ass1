@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 
+import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+
 
 /**
  * Created by huynhducthanhphong on 3/30/16.
@@ -26,6 +33,16 @@ import com.google.android.gms.location.places.Places;
 public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = BaseActivity.class.getName();
     private GoogleApiClient mGoogleApiClient;
+    private MapView mMapView;
+    private IMapController mIMapController;
+
+    public MapView getMapView() {
+        return mMapView;
+    }
+
+    public IMapController getIMapController() {
+        return mIMapController;
+    }
 
     // Phong - after onCreate() get called, onPostCreate was called to declare nav.
     @Override
@@ -114,5 +131,36 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             return null;
         }
         return LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+    }
+
+    // phong - make default map when opening the activity.
+    public void makeMapDefaultSetting() {
+        mMapView = (MapView) findViewById(R.id.map); // map
+        if (mMapView != null) {
+            mMapView.setTileSource(TileSourceFactory.MAPNIK);
+            mMapView.setMultiTouchControls(true);
+            mIMapController = mMapView.getController(); // map controller
+            mIMapController.setZoom(10);
+            GeoPoint startPoint = new GeoPoint(10.772241, 106.657676);
+            mIMapController.setCenter(startPoint);
+        }
+    }
+
+    //phong - add marker at a location
+    public void setMarkerAtLocation(Location userCurrentLocation, int icon) {
+        if (userCurrentLocation != null) {
+            GeoPoint userCurrentPoint = new GeoPoint(userCurrentLocation.getLatitude(), userCurrentLocation.getLongitude());
+            mIMapController.setCenter(userCurrentPoint);
+            mIMapController.zoomTo(mMapView.getMaxZoomLevel());
+            Marker hereMarker = new Marker(mMapView);
+            hereMarker.setPosition(userCurrentPoint);
+            hereMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            hereMarker.setIcon(ContextCompat.getDrawable(getApplication(), icon));
+//                        hereMarker.setTitle("You here");
+            mMapView.getOverlays().add(hereMarker);
+            mMapView.invalidate();
+        } else {
+            Log.i(TAG, "onClick: Not determine your current location");
+        }
     }
 }
