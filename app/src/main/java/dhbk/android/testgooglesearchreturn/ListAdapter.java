@@ -7,6 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 
@@ -30,7 +33,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         File imageView = mImageFile[position];
         ImageView imgView = holder.getImageView();
-        setReductImageSize(imgView, imageView.getAbsolutePath());
+//        setReductImageSize(imgView, imageView.getAbsolutePath());
+        Toast.makeText(imgView.getContext(), "NEW", Toast.LENGTH_SHORT).show();
+        Picasso.with(imgView.getContext()).load(imageView).into(imgView);
+
     }
 
     private void setReductImageSize(ImageView img, String imageFileLocation) {

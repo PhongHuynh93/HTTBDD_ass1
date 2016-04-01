@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
@@ -210,23 +208,6 @@ public class ShareActivity extends BaseActivity {
         return img;
     }
 
-    // take photo as wanted resolution
-    private void setReductImageSize() {
-        int width = img.getWidth();
-        int height = img.getHeight();
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(imageFileLocation, options);
-
-        int cameraImageWidth = options.outWidth;
-        int cameraImageHeight = options.outHeight;
-        int scaleFactor = Math.min(cameraImageHeight / width, cameraImageHeight / height);
-
-        options.inSampleSize = scaleFactor;
-        options.inJustDecodeBounds = false;
-        Bitmap bmp = BitmapFactory.decodeFile(imageFileLocation, options);
-        img.setImageBitmap(bmp);
-    }
 
     public void startGalleryActivity(View v) {
         Intent intent = new Intent(this, ListTripActivity.class);
