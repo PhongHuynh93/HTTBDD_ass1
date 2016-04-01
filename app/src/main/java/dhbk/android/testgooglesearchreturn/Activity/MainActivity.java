@@ -1,55 +1,39 @@
-package dhbk.android.testgooglesearchreturn;
+package dhbk.android.testgooglesearchreturn.Activity;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.text.Spanned;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
-import org.osmdroid.api.IMapController;
-import org.osmdroid.bonuspack.overlays.Marker;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+
+import dhbk.android.testgooglesearchreturn.ClassHelp.PhotoTask;
+import dhbk.android.testgooglesearchreturn.R;
 
 
 public class MainActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "MainApp";
+    // Map
+    private MapView mMapView;
+    private GoogleApiClient mGoogleApiClient;
+
     //    declare bottom sheet
     private BottomSheetBehavior mBottomSheetBehavior;
     private FrameLayout mBottomSheetDetailPlace;
@@ -57,7 +41,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     private TextView mAddressName;
     private TextView mPhoneName;
     private TextView mWebsiteName;
-    private MapView mMapView;
+    private ImageView mImagePlace;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +52,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
         // Phong - show the map + add 2 zoom button + zoom at a default view point
         makeMapDefaultSetting();
         mMapView = getMapView();
+        mGoogleApiClient = getmGoogleApiClient();
+
         // TODO: 3/30/16 Hiếu - khi mở, app sẽ xét xem mình có mở GPS chưa, nếu chưa thì app sẽ hiện 1 hộp thoại "Dialog" yêu cầu người dùng mở GPS, ông sẽ hiện thực hộp thoại này
 
         // Phong - when click fab, zoom to user's location
@@ -80,10 +67,13 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     }
 
     private void declareBottomSheet() {
+        // place details
         mPlaceName = (TextView) findViewById(R.id.place_name);
         mAddressName = (TextView) findViewById(R.id.address_name);
         mPhoneName = (TextView) findViewById(R.id.phone_name);
         mWebsiteName = (TextView) findViewById(R.id.website_name);
+        // place image
+        mImagePlace = (ImageView) findViewById(R.id.image_place);
         mBottomSheetDetailPlace = (FrameLayout) findViewById(R.id.map_bottom_sheets);
         mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheetDetailPlace);
 
@@ -111,6 +101,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 //                    mPlaceAttribution.setText("");
 //                }
                 if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                    // add place details
                     if (place.getName() != null) {
                         mPlaceName.setText(place.getName());
                     }
@@ -123,6 +114,10 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                     if (place.getWebsiteUri() != null) {
                         mWebsiteName.setText(place.getWebsiteUri() + "");
                     }
+
+                    // add place photos
+                    addPhotoToBottomSheet(place.getId(), mGoogleApiClient);
+
                     mBottomSheetBehavior.setPeekHeight(369);
                     mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
@@ -177,5 +172,25 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
         });
     }
 
+    // add a google photo to google image view.
+    private void addPhotoToBottomSheet(String id, GoogleApiClient mGoogleApiClient) {
+        Log.i(TAG, "addPhotoToBottomSheet: Hàm này đã được goi");
+        new PhotoTask(mImagePlace.getWidth(), mImagePlace.getHeight()) {
+            @Override
+            protected void onPreExecute() {
+                // Display a temporary image to show while bitmap is loading.
+                mImagePlace.setImageResource(R.drawable.ic_face_black_24dp);
+            }
+
+            @Override
+            protected void onPostExecute(AttributedPhoto attributedPhoto) {
+                if (attributedPhoto != null) {
+                    // Photo has been loaded, display it.
+                    Log.i(TAG, "onPostExecute: Image được tải về là: " + attributedPhoto.bitmap);
+                    mImagePlace.setImageBitmap(attributedPhoto.bitmap);
+                }
+            }
+        }.execute(new PhotoTask.MyTaskParams(id, mGoogleApiClient));
+    }
 
 }
