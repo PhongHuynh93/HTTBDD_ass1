@@ -7,7 +7,10 @@ import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+<<<<<<< HEAD:app/src/main/java/dhbk/android/testgooglesearchreturn/Activity/MainActivity.java
 import android.text.Html;
+=======
+>>>>>>> master:app/src/main/java/dhbk/android/testgooglesearchreturn/MainActivity.java
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
