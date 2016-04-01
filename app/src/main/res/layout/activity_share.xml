@@ -13,32 +13,6 @@
     <include layout="@layout/content_share" />
 
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/camera"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/stop"
-            android:layout_alignEnd="@+id/map"
-            android:layout_alignRight="@+id/map"
-            android:layout_gravity="bottom|end"
-            android:layout_marginBottom="20dp"
-            android:layout_marginRight="10dp"
-            android:onClick="cameraActivtiy"
-            android:src="@android:drawable/ic_menu_camera"/>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/stop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/camera"
-            android:layout_alignParentBottom="true"
-            android:layout_alignStart="@+id/camera"
-            android:layout_gravity="bottom|end"
-            android:layout_marginBottom="16dp"
-            android:onClick="startGalleryActivity"
-            android:src="@android:drawable/ic_lock_power_off"/>
-
-    </RelativeLayout>
     <!--navigation drawer-->
-    <include layout="@layout/content_navigationdrawer"/>
+    <include layout="@layout/content_navigationdrawer" />
 </android.support.v4.widget.DrawerLayout>
