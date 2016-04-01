@@ -1,4 +1,4 @@
-package dhbk.android.testgooglesearchreturn;
+package dhbk.android.testgooglesearchreturn.Activity;
 
 import android.Manifest;
 import android.content.Context;
@@ -32,6 +32,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import dhbk.android.testgooglesearchreturn.ListTripActivity;
+import dhbk.android.testgooglesearchreturn.R;
 
 
 public class ShareActivity extends BaseActivity {
