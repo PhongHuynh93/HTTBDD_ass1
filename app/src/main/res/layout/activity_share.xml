@@ -12,6 +12,7 @@
     <!--your main content-->
     <include layout="@layout/content_share" />
 
+
     <!--navigation drawer-->
-    <include layout="@layout/content_navigationdrawer"/>
+    <include layout="@layout/content_navigationdrawer" />
 </android.support.v4.widget.DrawerLayout>
