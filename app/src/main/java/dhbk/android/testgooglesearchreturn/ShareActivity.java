@@ -72,21 +72,21 @@ public class ShareActivity extends BaseActivity {
         /*Gallery*/
         createImageGallery(); //create gallery when onCreate
         /*Map*/
-        map = (MapView) findViewById(R.id.map);
-        map.setTileSource(TileSourceFactory.MAPNIK);
+        mMap = (MapView) findViewById(R.id.map);
+        mMap.setTileSource(TileSourceFactory.MAPNIK);
 
-        map.setBuiltInZoomControls(true);
-        map.setMultiTouchControls(true);
-        mapController = map.getController();
+        mMap.setBuiltInZoomControls(true);
+        mMap.setMultiTouchControls(true);
+        mapController = mMap.getController();
         mapController.setZoom(18);
         GeoPoint startPoint = new GeoPoint(10.772241, 106.657676);
         mapController.setCenter(startPoint);
         route = new ArrayList<GeoPoint>();
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        mStart = new Marker(map);
+        mStart = new Marker(mMap);
         Drawable startIcon = getResources().getDrawable(R.drawable.start);
         mStart.setIcon(startIcon);
-        mEnd = new Marker(map);
+        mEnd = new Marker(mMap);
         Drawable end = getResources().getDrawable(R.drawable.end);
         mEnd.setIcon(end);
 
@@ -122,12 +122,12 @@ public class ShareActivity extends BaseActivity {
                 route.add(temp);
                 Road road = new Road(route);
                 Polyline line = roadManager.buildRoadOverlay(road, getBaseContext());
-                map.getOverlays().add(line);
-                map.invalidate();
+                mMap.getOverlays().add(line);
+                mMap.invalidate();
                 if (route.size() == 1) {
                     mStart.setPosition(temp);
-                    map.getOverlays().add(mStart);
-                    map.invalidate();
+                    mMap.getOverlays().add(mStart);
+                    mMap.invalidate();
                     if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
                         locationManager.removeUpdates(locationListenerNetWork);
@@ -135,10 +135,10 @@ public class ShareActivity extends BaseActivity {
 
                 } else if (route.size() > 2) {
                     if (mEnd.getPosition() != null)
-                        map.getOverlays().remove(mEnd);
+                        mMap.getOverlays().remove(mEnd);
                     mEnd.setPosition(temp);
-                    map.getOverlays().add(mEnd);
-                    map.invalidate();
+                    mMap.getOverlays().add(mEnd);
+                    mMap.invalidate();
                 }
 
             }
@@ -161,7 +161,7 @@ public class ShareActivity extends BaseActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 10000, 0, locationListenerNetWork);
             locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 0, 0, locationListenerGPS);
-            map.getOverlays().clear();
+            mMap.getOverlays().clear();
         }
 
     }
