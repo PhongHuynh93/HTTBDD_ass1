@@ -1,32 +1,29 @@
 package dhbk.android.testgooglesearchreturn.Activity;
 
-<<<<<<< HEAD:app/src/main/java/dhbk/android/testgooglesearchreturn/Activity/ShareActivity.java
-=======
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
->>>>>>> master:app/src/main/java/dhbk/android/testgooglesearchreturn/ShareActivity.java
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-<<<<<<< HEAD:app/src/main/java/dhbk/android/testgooglesearchreturn/Activity/ShareActivity.java
-=======
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
->>>>>>> master:app/src/main/java/dhbk/android/testgooglesearchreturn/ShareActivity.java
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
@@ -36,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import dhbk.android.testgooglesearchreturn.ListTripActivity;
 import dhbk.android.testgooglesearchreturn.R;
 
 
