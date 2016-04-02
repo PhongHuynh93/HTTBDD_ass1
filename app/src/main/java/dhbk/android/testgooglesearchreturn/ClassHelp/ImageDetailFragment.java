@@ -13,6 +13,7 @@ import dhbk.android.testgooglesearchreturn.R;
 
 /**
  * Created by huynhducthanhphong on 4/2/16.
+ * Contains an ImageView
  */
 public class ImageDetailFragment extends Fragment {
     private static final String IMAGE_DATA_EXTRA = "resId";
@@ -29,7 +30,8 @@ public class ImageDetailFragment extends Fragment {
     }
 
     // Empty constructor, required as per Fragment docs
-    public ImageDetailFragment() {}
+    public ImageDetailFragment() {
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,7 +42,6 @@ public class ImageDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // image_detail_fragment.xml contains just an ImageView
         final View v = inflater.inflate(R.layout.image_detail_fragment, container, false);
         mImageView = (ImageView) v.findViewById(R.id.imageView);
         return v;
@@ -49,10 +50,6 @@ public class ImageDetailFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // load image in asynctask
-//        if (MainActivity.class.isInstance(getActivity())) {
-//
-//        }
         Log.i(TAG, "doInBackground: Da co bitmap" + MainActivity.mArrayListAttributedPhoto.get(mImageNum).bitmap);
         mImageView.setImageBitmap(MainActivity.mArrayListAttributedPhoto.get(mImageNum).bitmap); // Load image into ImageView
     }
