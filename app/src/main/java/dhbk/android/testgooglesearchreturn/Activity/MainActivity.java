@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +27,7 @@ import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
 
+import dhbk.android.testgooglesearchreturn.ClassHelp.ImagePagerAdapter;
 import dhbk.android.testgooglesearchreturn.ClassHelp.PhotoTask;
 import dhbk.android.testgooglesearchreturn.R;
 
@@ -45,6 +47,10 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     private TextView mWebsiteName;
     private ImageView mImagePlace;
 
+    // contain Google photo
+    public static ArrayList<PhotoTask.AttributedPhoto> mArrayListAttributedPhoto;
+    private ViewPager viewPager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +61,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
         makeMapDefaultSetting();
         mMapView = getMapView();
         mGoogleApiClient = getmGoogleApiClient();
+
+        viewPager = (ViewPager)findViewById(R.id.imageSlider);
+
 
         // TODO: 3/30/16 Hiếu - khi mở, app sẽ xét xem mình có mở GPS chưa, nếu chưa thì app sẽ hiện 1 hộp thoại "Dialog" yêu cầu người dùng mở GPS, ông sẽ hiện thực hộp thoại này
 
@@ -75,7 +84,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
         mPhoneName = (TextView) findViewById(R.id.phone_name);
         mWebsiteName = (TextView) findViewById(R.id.website_name);
         // place image
-        mImagePlace = (ImageView) findViewById(R.id.image_place);
         mBottomSheetDetailPlace = (FrameLayout) findViewById(R.id.map_bottom_sheets);
         mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheetDetailPlace);
 
@@ -177,11 +185,10 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     // add a google photo to google image view.
     private void addPhotoToBottomSheet(String id, GoogleApiClient mGoogleApiClient) {
         Log.i(TAG, "addPhotoToBottomSheet: Hàm này đã được goi");
-        new PhotoTask(mImagePlace.getWidth(), mImagePlace.getHeight()) {
+        new PhotoTask(viewPager.getWidth(), viewPager.getHeight()) {
             @Override
             protected void onPreExecute() {
                 // Display a temporary image to show while bitmap is loading.
-                mImagePlace.setImageResource(R.drawable.ic_face_black_24dp);
             }
 
 //            @Override
@@ -195,7 +202,13 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 
             @Override
             protected void onPostExecute(ArrayList<AttributedPhoto> attributedPhotos) {
-
+                // load image on viewpager, remove old images and add new ones.
+                if (attributedPhotos.size() > 0) {
+                    Log.i(TAG, "onPostExecute: có return image");
+                    mArrayListAttributedPhoto = attributedPhotos;
+                    ImagePagerAdapter imagePagerAdapter = new ImagePagerAdapter(getSupportFragmentManager(), attributedPhotos.size());
+                    viewPager.setAdapter(imagePagerAdapter);
+                }
             }
         }.execute(new PhotoTask.MyTaskParams(id, mGoogleApiClient));
     }

@@ -79,10 +79,10 @@ public abstract class PhotoTask extends AsyncTask<PhotoTask.MyTaskParams, Void, 
             if (photoMetadataBuffer.getCount() > 0 && !isCancelled()) {
                 int countPhoto = photoMetadataBuffer.getCount();
                 while(countPhoto > 0) {
-                    Log.i(TAG, "doInBackground: đã có image");
+                    Log.i(TAG, "doInBackground: đã có image " + countPhoto);
 
                     // Get the first bitmap and its attributions.
-                    PlacePhotoMetadata photo = photoMetadataBuffer.get(0);
+                    PlacePhotoMetadata photo = photoMetadataBuffer.get(countPhoto - 1);
                     CharSequence attribution = photo.getAttributions();
 
                     // Load a scaled bitmap for this photo.(scale đúng theo tỷ lệ) + có kèm theo cache + await là lock cho đến khi xong
