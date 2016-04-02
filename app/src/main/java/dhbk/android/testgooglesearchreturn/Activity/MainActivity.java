@@ -45,6 +45,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     public static ArrayList<PhotoTask.AttributedPhoto> mArrayListAttributedPhoto;
     private ViewPager viewPager;
     private FloatingActionButton floatingActionButton;
+    private FloatingActionButton floatingActionButtonDirection;
     private boolean showFAB = true;
 
     @Override
@@ -107,6 +108,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                         showFAB = true;
                         floatingActionButton.setVisibility(View.VISIBLE);
                         floatingActionButton.startAnimation(growAnimation);
+                        floatingActionButtonDirection.startAnimation(growAnimation);
                         break;
                     case BottomSheetBehavior.STATE_EXPANDED:
                         Log.i(TAG, "onStateChanged: expanded");
@@ -216,6 +218,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                 }
             }
         });
+
+        floatingActionButtonDirection = (FloatingActionButton) findViewById(R.id.fab_direction);
     }
 
     // add a google photo to google image view.
