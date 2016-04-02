@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -11,6 +12,8 @@ import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -38,19 +41,11 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     private MapView mMapView;
     private GoogleApiClient mGoogleApiClient;
 
-    //    declare bottom sheet
-    private BottomSheetBehavior mBottomSheetBehavior;
-    private FrameLayout mBottomSheetDetailPlace;
-    private TextView mPlaceName;
-    private TextView mAddressName;
-    private TextView mPhoneName;
-    private TextView mWebsiteName;
-    private ImageView mImagePlace;
-
     // contain Google photo
     public static ArrayList<PhotoTask.AttributedPhoto> mArrayListAttributedPhoto;
     private ViewPager viewPager;
-
+    private FloatingActionButton floatingActionButton;
+    private boolean showFAB = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +57,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
         mMapView = getMapView();
         mGoogleApiClient = getmGoogleApiClient();
 
-        viewPager = (ViewPager)findViewById(R.id.imageSlider);
-
+        viewPager = (ViewPager) findViewById(R.id.imageSlider);
 
         // TODO: 3/30/16 Hiếu - khi mở, app sẽ xét xem mình có mở GPS chưa, nếu chưa thì app sẽ hiện 1 hộp thoại "Dialog" yêu cầu người dùng mở GPS, ông sẽ hiện thực hộp thoại này
 
@@ -72,24 +66,66 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 
         // search view
         declareSearchView();
-
-        // bottom sheet
-        declareBottomSheet();
-    }
-
-    private void declareBottomSheet() {
-        // place details
-        mPlaceName = (TextView) findViewById(R.id.place_name);
-        mAddressName = (TextView) findViewById(R.id.address_name);
-        mPhoneName = (TextView) findViewById(R.id.phone_name);
-        mWebsiteName = (TextView) findViewById(R.id.website_name);
-        // place image
-        mBottomSheetDetailPlace = (FrameLayout) findViewById(R.id.map_bottom_sheets);
-        mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheetDetailPlace);
-
     }
 
     private void declareSearchView() {
+        // To handle FAB animation upon entrance and exit
+        final Animation growAnimation = AnimationUtils.loadAnimation(this, R.anim.simple_grow);
+        final Animation shrinkAnimation = AnimationUtils.loadAnimation(this, R.anim.simple_shrink);
+        shrinkAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                floatingActionButton.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        // bottom sheet
+        View bottomSheetDetailPlace = findViewById(R.id.map_bottom_sheets);
+        final BottomSheetBehavior<View> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetDetailPlace);
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                Log.d(TAG, "onStateChanged: goi bottom sheet");
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        Log.i(TAG, "onStateChanged: drag");
+                        if (showFAB)
+                            floatingActionButton.startAnimation(shrinkAnimation);
+                        break;
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        Log.i(TAG, "onStateChanged: collapsed");
+                        showFAB = true;
+                        floatingActionButton.setVisibility(View.VISIBLE);
+                        floatingActionButton.startAnimation(growAnimation);
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        Log.i(TAG, "onStateChanged: expanded");
+                        showFAB = false;
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(View bottomSheet, float slideOffset) {
+
+            }
+        });
+        // place details
+        final TextView placeName = (TextView) findViewById(R.id.place_name);
+        final TextView addressName = (TextView) findViewById(R.id.address_name);
+        final TextView phoneName = (TextView) findViewById(R.id.phone_name);
+        final TextView websiteName = (TextView) findViewById(R.id.website_name);
+
         final PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
@@ -110,26 +146,26 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 //                } else {
 //                    mPlaceAttribution.setText("");
 //                }
-                if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
                     // add place details
                     if (place.getName() != null) {
-                        mPlaceName.setText(place.getName());
+                        placeName.setText(place.getName());
                     }
                     if (place.getAddress() != null) {
-                        mAddressName.setText(place.getAddress());
+                        addressName.setText(place.getAddress());
                     }
                     if (place.getPhoneNumber() != null) {
-                        mPhoneName.setText(place.getPhoneNumber());
+                        phoneName.setText(place.getPhoneNumber());
                     }
                     if (place.getWebsiteUri() != null) {
-                        mWebsiteName.setText(place.getWebsiteUri() + "");
+                        websiteName.setText(place.getWebsiteUri() + "");
                     }
 
                     // add place photos
                     addPhotoToBottomSheet(place.getId(), mGoogleApiClient);
 
-                    mBottomSheetBehavior.setPeekHeight(369);
-                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    bottomSheetBehavior.setPeekHeight(369);
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
 
                 // remove marker on the map, center at that point and add marker.
@@ -154,15 +190,15 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
             public void onClick(View view) {
                 ((EditText) autocompleteFragment.getView().findViewById(R.id.place_autocomplete_search_input)).setText("");
                 view.setVisibility(View.GONE);
-                mBottomSheetBehavior.setPeekHeight(0);
-                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                bottomSheetBehavior.setPeekHeight(0);
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
     }
 
 
     private void declareFAB() {
-        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab_my_location);
+        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab_my_location);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -191,17 +227,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                 // Display a temporary image to show while bitmap is loading.
             }
 
-//            @Override
-//            protected void onPostExecute(AttributedPhoto attributedPhoto) {
-//                if (attributedPhoto != null) {
-//                    // Photo has been loaded, display it.
-//                    Log.i(TAG, "onPostExecute: Image được tải về là: " + attributedPhoto.bitmap);
-//                    mImagePlace.setImageBitmap(attributedPhoto.bitmap);
-//                }
-//            }
-
             @Override
             protected void onPostExecute(ArrayList<AttributedPhoto> attributedPhotos) {
+
                 // load image on viewpager, remove old images and add new ones.
                 if (attributedPhotos.size() > 0) {
                     Log.i(TAG, "onPostExecute: có return image");
