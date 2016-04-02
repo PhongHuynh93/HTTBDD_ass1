@@ -24,6 +24,8 @@ import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
 import org.osmdroid.views.MapView;
 
+import java.util.ArrayList;
+
 import dhbk.android.testgooglesearchreturn.ClassHelp.PhotoTask;
 import dhbk.android.testgooglesearchreturn.R;
 
@@ -182,13 +184,18 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                 mImagePlace.setImageResource(R.drawable.ic_face_black_24dp);
             }
 
+//            @Override
+//            protected void onPostExecute(AttributedPhoto attributedPhoto) {
+//                if (attributedPhoto != null) {
+//                    // Photo has been loaded, display it.
+//                    Log.i(TAG, "onPostExecute: Image được tải về là: " + attributedPhoto.bitmap);
+//                    mImagePlace.setImageBitmap(attributedPhoto.bitmap);
+//                }
+//            }
+
             @Override
-            protected void onPostExecute(AttributedPhoto attributedPhoto) {
-                if (attributedPhoto != null) {
-                    // Photo has been loaded, display it.
-                    Log.i(TAG, "onPostExecute: Image được tải về là: " + attributedPhoto.bitmap);
-                    mImagePlace.setImageBitmap(attributedPhoto.bitmap);
-                }
+            protected void onPostExecute(ArrayList<AttributedPhoto> attributedPhotos) {
+
             }
         }.execute(new PhotoTask.MyTaskParams(id, mGoogleApiClient));
     }

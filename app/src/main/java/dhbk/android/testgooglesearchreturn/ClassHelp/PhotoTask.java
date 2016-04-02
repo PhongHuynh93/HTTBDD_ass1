@@ -11,10 +11,12 @@ import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.Places;
 
+import java.util.ArrayList;
+
 /**
  * Created by huynhducthanhphong on 4/1/16.
  */
-public abstract class PhotoTask extends AsyncTask<PhotoTask.MyTaskParams, Void, PhotoTask.AttributedPhoto> {
+public abstract class PhotoTask extends AsyncTask<PhotoTask.MyTaskParams, Void, ArrayList<PhotoTask.AttributedPhoto>> {
     private static final String TAG = PhotoTask.class.getName();
     private int mHeight;
     private int mWidth;
@@ -52,7 +54,7 @@ public abstract class PhotoTask extends AsyncTask<PhotoTask.MyTaskParams, Void, 
      * The place id must be the first (and only) parameter.
      */
     @Override
-    protected AttributedPhoto doInBackground(MyTaskParams... params) {
+    protected ArrayList<AttributedPhoto> doInBackground(MyTaskParams... params) {
         if (params.length != 1) {
             return null;
         }
@@ -66,26 +68,38 @@ public abstract class PhotoTask extends AsyncTask<PhotoTask.MyTaskParams, Void, 
         PlacePhotoMetadataResult result = Places.GeoDataApi
                 .getPlacePhotos(mGoogleApiClient, placeId).await();
 
+        // arraylist to contains all of image which is downloaded.
+        ArrayList<AttributedPhoto> attributedPhotoArrayList = new ArrayList<>();
+
         if (result.getStatus().isSuccess()) {
             // Get a PhotoMetadataBuffer instance containing a list of photos (PhotoMetadata).
             PlacePhotoMetadataBuffer photoMetadataBuffer = result.getPhotoMetadata();
             Log.i(TAG, "doInBackground: Ket noi thanh cong google photo");
 
             if (photoMetadataBuffer.getCount() > 0 && !isCancelled()) {
-                Log.i(TAG, "doInBackground: đã có image");
+                int countPhoto = photoMetadataBuffer.getCount();
+                while(countPhoto > 0) {
+                    Log.i(TAG, "doInBackground: đã có image");
 
-                // Get the first bitmap and its attributions.
-                PlacePhotoMetadata photo = photoMetadataBuffer.get(0);
-                CharSequence attribution = photo.getAttributions();
-                // Load a scaled bitmap for this photo.
-                Bitmap image = photo.getScaledPhoto(mGoogleApiClient, mWidth, mHeight).await()
-                        .getBitmap();
+                    // Get the first bitmap and its attributions.
+                    PlacePhotoMetadata photo = photoMetadataBuffer.get(0);
+                    CharSequence attribution = photo.getAttributions();
 
-                attributedPhoto = new AttributedPhoto(attribution, image);
+                    // Load a scaled bitmap for this photo.(scale đúng theo tỷ lệ) + có kèm theo cache + await là lock cho đến khi xong
+                    Bitmap image = photo.getScaledPhoto(mGoogleApiClient, mWidth, mHeight).await()
+                            .getBitmap();
+
+                    attributedPhoto = new AttributedPhoto(attribution, image);
+                    attributedPhotoArrayList.add(attributedPhoto);
+                    countPhoto--;
+                }
+
+
             }
             // Release the PlacePhotoMetadataBuffer.
             photoMetadataBuffer.release();
         }
-        return attributedPhoto;
+        // return array of photos.
+        return attributedPhotoArrayList;
     }
 }
