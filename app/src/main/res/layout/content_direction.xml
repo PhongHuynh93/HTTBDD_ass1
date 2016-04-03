@@ -41,12 +41,12 @@
                     app:cardBackgroundColor="@color/colorAccent">
 
                     <EditText
-                        android:inputType="text"
-                        android:maxLines="1"
                         android:id="@+id/start_point"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/start_point"
+                        android:inputType="text"
+                        android:maxLines="1"
                         android:textColor="@color/colorPrimaryDark"
                         android:textColorHint="@color/colorPrimaryDark" />
 
@@ -59,12 +59,12 @@
                     app:cardBackgroundColor="@color/colorAccent">
 
                     <EditText
-                        android:inputType="text"
-                        android:maxLines="1"
                         android:id="@+id/end_point"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/des_point"
+                        android:inputType="text"
+                        android:maxLines="1"
                         android:textColor="@color/colorPrimaryDark"
                         android:textColorHint="@color/colorPrimaryDark" />
                 </android.support.v7.widget.CardView>
@@ -73,30 +73,28 @@
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
-    <!--map-->
-    <org.osmdroid.views.MapView
-        android:id="@+id/map"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
-    <!--fab nằm ở cuối layout + neo tại top|right của bottom sheet-->
-    <!--direction fab-->
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_direction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_menu_directions"
-        android:tint="@color/colorAccent"
-        app:backgroundTint="@color/colorPrimary" />
+    <!--content main: map + bottom nav-->
+    <FrameLayout
+        android:id="@+id/content_map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <org.osmdroid.views.MapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
     <!--here location fab-->
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_my_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_menu_mylocation"
-        android:tint="@color/colorPrimaryDark" />
+        android:tint="@color/colorPrimaryDark"
+        app:layout_anchor="@id/toolbar"
+        app:layout_anchorGravity="bottom|end" />
+
 </android.support.design.widget.CoordinatorLayout>
