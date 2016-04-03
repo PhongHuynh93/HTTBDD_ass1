@@ -163,7 +163,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_menu_directions"
         android:tint="@color/colorAccent"
-        app:backgroundTint="@color/colorPrimary"
+        app:backgroundTint="@color/colorBlue"
         app:layout_anchor="@id/map_bottom_sheets"
         app:layout_anchorGravity="top|start" />
     <!--here location fab-->
