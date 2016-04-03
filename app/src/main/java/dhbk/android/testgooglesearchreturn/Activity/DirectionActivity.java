@@ -81,20 +81,38 @@ public class DirectionActivity extends BaseActivity{
     }
 
     private void declareBottomNavigation(Bundle savedInstanceState) {
+//        mBottomBar = BottomBar.attach(this, savedInstanceState);
+//        mBottomBar.setItemsFromMenu(R.menu.bottombar_menu, new OnMenuTabClickListener() {
+//            @Override
+//            public void onMenuTabSelected(@IdRes int menuItemId) {
+//                if (menuItemId == R.id.bottomBarItemRun) {
+//                    // The user selected item number one.
+//                }
+//            }
+//
+//            @Override
+//            public void onMenuTabReSelected(@IdRes int menuItemId) {
+//                if (menuItemId == R.id.bottomBarItemRun) {
+//                    // The user reselected item number one, scroll your content to top.
+//                }
+//            }
+//        });
+//
+//        // Setting colors for different tabs when there's more than three of them.
+//        // You can set colors for tabs in three different ways as shown below.
+//        mBottomBar.mapColorForTab(0, ContextCompat.getColor(this, R.color.colorAccent));
+//        mBottomBar.mapColorForTab(1, 0xFF5D4037);
+//        mBottomBar.mapColorForTab(2, "#7B1FA2");
+//        mBottomBar.mapColorForTab(3, "#FF5252");
+
         mBottomBar = BottomBar.attach(this, savedInstanceState);
         mBottomBar.setItemsFromMenu(R.menu.bottombar_menu, new OnMenuTabClickListener() {
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
-                if (menuItemId == R.id.bottomBarItemRun) {
-                    // The user selected item number one.
-                }
             }
 
             @Override
             public void onMenuTabReSelected(@IdRes int menuItemId) {
-                if (menuItemId == R.id.bottomBarItemRun) {
-                    // The user reselected item number one, scroll your content to top.
-                }
             }
         });
 
@@ -104,6 +122,7 @@ public class DirectionActivity extends BaseActivity{
         mBottomBar.mapColorForTab(1, 0xFF5D4037);
         mBottomBar.mapColorForTab(2, "#7B1FA2");
         mBottomBar.mapColorForTab(3, "#FF5252");
+        mBottomBar.mapColorForTab(4, "#FF9800"  );
     }
 
     private void openAutocompleteActivity(int code) {
