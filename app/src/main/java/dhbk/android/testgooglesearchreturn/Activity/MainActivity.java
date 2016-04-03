@@ -47,6 +47,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     private ViewPager viewPager;
     private boolean showFAB = true;
 
+    // place id obtains when search
+    public static CharSequence mPlaceName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +93,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
         floatingActionButtonDirection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // send to Direction activity with place id.
                 Intent intent = new Intent(getApplication(), DirectionActivity.class);
                 startActivity(intent);
             }
@@ -163,6 +167,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                 Log.i(TAG, "Place Selected: " + place.getAddress());
                 Log.i(TAG, "Place Selected: " + place.getPhoneNumber());
                 Log.i(TAG, "Place Selected: " + place.getWebsiteUri());
+                mPlaceName = place.getName();
                 // Format the returned place's details and display them in the TextView.
 //                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(), place.getId(),
 //                        place.getAddress(), place.getPhoneNumber(), place.getWebsiteUri()));

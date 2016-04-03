@@ -51,6 +51,10 @@ public class DirectionActivity extends BaseActivity{
             }
         });
         endPoint = (EditText)findViewById(R.id.end_point);
+        if (MainActivity.mPlaceName != null) {
+            assert endPoint != null;
+            endPoint.setText(MainActivity.mPlaceName);
+        }
         endPoint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
