@@ -55,6 +55,8 @@
                 android:paddingRight="56dp">
 
                 <TextView
+                    android:inputType="text"
+                    android:maxLines="1"
                     android:id="@+id/place_name"
                     style="@style/TextAppearance.AppCompat.Headline"
                     android:layout_width="match_parent"

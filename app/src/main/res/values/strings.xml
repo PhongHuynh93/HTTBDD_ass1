@@ -4,4 +4,7 @@
     <!--nav-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="start_point">Choosing starting point</string>
+    <string name="des_point">Choosing ending point</string>
+    <string name="yourLocation">Your location</string>
 </resources>
