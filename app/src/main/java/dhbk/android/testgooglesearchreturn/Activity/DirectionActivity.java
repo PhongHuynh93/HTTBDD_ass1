@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -18,6 +19,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.server.converter.StringToIntConverter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.roughike.bottombar.BottomBar;
@@ -32,17 +34,18 @@ public class DirectionActivity extends BaseActivity{
     private static final int REQUEST_CODE_AUTOCOMPLETE_EDITTEXT_1 = 1;
     private static final int REQUEST_CODE_AUTOCOMPLETE_EDITTEXT_2 = 2;
     private static final String TAG = DirectionActivity.class.getName();
-    private EditText startPoint;
-    private EditText endPoint;
+    private EditText mStartPoint;
+    private EditText mEndPoint;
     private BottomBar mBottomBar;
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_direction);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         makeMapDefaultSetting();
@@ -55,22 +58,22 @@ public class DirectionActivity extends BaseActivity{
     }
 
     private void declareFab() {
-        startPoint = (EditText)findViewById(R.id.start_point);
-        assert startPoint != null;
-        startPoint.setText(R.string.yourLocation);
-        startPoint.setOnClickListener(new View.OnClickListener() {
+        mStartPoint = (EditText)findViewById(R.id.start_point);
+        assert mStartPoint != null;
+        mStartPoint.setText(R.string.yourLocation);
+        mStartPoint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // call search activity
                 openAutocompleteActivity(REQUEST_CODE_AUTOCOMPLETE_EDITTEXT_1);
             }
         });
-        endPoint = (EditText)findViewById(R.id.end_point);
+        mEndPoint = (EditText)findViewById(R.id.end_point);
         if (MainActivity.mPlaceName != null) {
-            assert endPoint != null;
-            endPoint.setText(MainActivity.mPlaceName);
+            assert mEndPoint != null;
+            mEndPoint.setText(MainActivity.mPlaceName);
         }
-        endPoint.setOnClickListener(new View.OnClickListener() {
+        mEndPoint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // call search activity
@@ -81,34 +84,20 @@ public class DirectionActivity extends BaseActivity{
     }
 
     private void declareBottomNavigation(Bundle savedInstanceState) {
-//        mBottomBar = BottomBar.attach(this, savedInstanceState);
-//        mBottomBar.setItemsFromMenu(R.menu.bottombar_menu, new OnMenuTabClickListener() {
-//            @Override
-//            public void onMenuTabSelected(@IdRes int menuItemId) {
-//                if (menuItemId == R.id.bottomBarItemRun) {
-//                    // The user selected item number one.
-//                }
-//            }
-//
-//            @Override
-//            public void onMenuTabReSelected(@IdRes int menuItemId) {
-//                if (menuItemId == R.id.bottomBarItemRun) {
-//                    // The user reselected item number one, scroll your content to top.
-//                }
-//            }
-//        });
-//
-//        // Setting colors for different tabs when there's more than three of them.
-//        // You can set colors for tabs in three different ways as shown below.
-//        mBottomBar.mapColorForTab(0, ContextCompat.getColor(this, R.color.colorAccent));
-//        mBottomBar.mapColorForTab(1, 0xFF5D4037);
-//        mBottomBar.mapColorForTab(2, "#7B1FA2");
-//        mBottomBar.mapColorForTab(3, "#FF5252");
+        mBottomBar = BottomBar.attach(findViewById(R.id.map), savedInstanceState);
 
-        mBottomBar = BottomBar.attach(this, savedInstanceState);
         mBottomBar.setItemsFromMenu(R.menu.bottombar_menu, new OnMenuTabClickListener() {
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
+                if (menuItemId == R.id.bottomBarItemRun) {
+                    mToolbar.setBackgroundColor(getResources().getColor(R.color.bot1));
+                } else  if (menuItemId == R.id.bottomBarItemBike) {
+                    mToolbar.setBackgroundColor(getResources().getColor(R.color.bot2));
+                } else  if (menuItemId == R.id.bottomBarItemBus) {
+                    mToolbar.setBackgroundColor(getResources().getColor(R.color.bot3));
+                } else  if (menuItemId == R.id.bottomBarItemCar) {
+                    mToolbar.setBackgroundColor(getResources().getColor(R.color.bot4));
+                }
             }
 
             @Override
@@ -118,11 +107,10 @@ public class DirectionActivity extends BaseActivity{
 
         // Setting colors for different tabs when there's more than three of them.
         // You can set colors for tabs in three different ways as shown below.
-        mBottomBar.mapColorForTab(0, ContextCompat.getColor(this, R.color.colorAccent));
-        mBottomBar.mapColorForTab(1, 0xFF5D4037);
-        mBottomBar.mapColorForTab(2, "#7B1FA2");
-        mBottomBar.mapColorForTab(3, "#FF5252");
-        mBottomBar.mapColorForTab(4, "#FF9800"  );
+        mBottomBar.mapColorForTab(0, "#795548");//0xFF5D4037);
+        mBottomBar.mapColorForTab(1, "#7B1FA2");//"#7B1FA2");
+        mBottomBar.mapColorForTab(2, "#FF5252");//"#FF5252");
+        mBottomBar.mapColorForTab(3, "#FF9800");//"#FF9800"  );
     }
 
     private void openAutocompleteActivity(int code) {
@@ -158,7 +146,7 @@ public class DirectionActivity extends BaseActivity{
                 // Get the user's selected place from the Intent.
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 Log.i(TAG, "Place Selected: " + place.getName());
-                startPoint.setText(place.getName());
+                mStartPoint.setText(place.getName());
 
                 // Format the place's details and display them in the TextView.
 //                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),
@@ -184,7 +172,7 @@ public class DirectionActivity extends BaseActivity{
                 // Get the user's selected place from the Intent.
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 Log.i(TAG, "Place Selected: " + place.getName());
-                endPoint.setText(place.getName());
+                mEndPoint.setText(place.getName());
 
                 // Format the place's details and display them in the TextView.
 //                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),
