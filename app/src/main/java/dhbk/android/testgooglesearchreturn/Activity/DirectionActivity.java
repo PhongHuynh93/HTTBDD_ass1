@@ -43,6 +43,8 @@ public class DirectionActivity extends BaseActivity{
         makeMapDefaultSetting();
 
         startPoint = (EditText)findViewById(R.id.start_point);
+        assert startPoint != null;
+        startPoint.setText(R.string.yourLocation);
         startPoint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
