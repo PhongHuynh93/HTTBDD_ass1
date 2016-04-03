@@ -2,7 +2,9 @@ package dhbk.android.testgooglesearchreturn.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.TextUtils;
@@ -18,6 +20,8 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.OnMenuTabClickListener;
 
 import dhbk.android.testgooglesearchreturn.R;
 
@@ -30,6 +34,7 @@ public class DirectionActivity extends BaseActivity{
     private static final String TAG = DirectionActivity.class.getName();
     private EditText startPoint;
     private EditText endPoint;
+    private BottomBar mBottomBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,6 +47,14 @@ public class DirectionActivity extends BaseActivity{
 
         makeMapDefaultSetting();
 
+        declareFab();
+
+        declareBottomNavigation(savedInstanceState);
+
+
+    }
+
+    private void declareFab() {
         startPoint = (EditText)findViewById(R.id.start_point);
         assert startPoint != null;
         startPoint.setText(R.string.yourLocation);
@@ -64,6 +77,33 @@ public class DirectionActivity extends BaseActivity{
                 openAutocompleteActivity(REQUEST_CODE_AUTOCOMPLETE_EDITTEXT_2);
             }
         });
+
+    }
+
+    private void declareBottomNavigation(Bundle savedInstanceState) {
+        mBottomBar = BottomBar.attach(this, savedInstanceState);
+        mBottomBar.setItemsFromMenu(R.menu.bottombar_menu, new OnMenuTabClickListener() {
+            @Override
+            public void onMenuTabSelected(@IdRes int menuItemId) {
+                if (menuItemId == R.id.bottomBarItemRun) {
+                    // The user selected item number one.
+                }
+            }
+
+            @Override
+            public void onMenuTabReSelected(@IdRes int menuItemId) {
+                if (menuItemId == R.id.bottomBarItemRun) {
+                    // The user reselected item number one, scroll your content to top.
+                }
+            }
+        });
+
+        // Setting colors for different tabs when there's more than three of them.
+        // You can set colors for tabs in three different ways as shown below.
+        mBottomBar.mapColorForTab(0, ContextCompat.getColor(this, R.color.colorAccent));
+        mBottomBar.mapColorForTab(1, 0xFF5D4037);
+        mBottomBar.mapColorForTab(2, "#7B1FA2");
+        mBottomBar.mapColorForTab(3, "#FF5252");
     }
 
     private void openAutocompleteActivity(int code) {
@@ -147,6 +187,15 @@ public class DirectionActivity extends BaseActivity{
                 // the user pressed the back button.
             }
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Necessary to restore the BottomBar's state, otherwise we would
+        // lose the current tab on orientation change.
+        mBottomBar.onSaveInstanceState(outState);
     }
 
 
