@@ -1,6 +1,7 @@
 package dhbk.android.testgooglesearchreturn.Activity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -44,8 +45,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     // contain Google photo
     public static ArrayList<PhotoTask.AttributedPhoto> mArrayListAttributedPhoto;
     private ViewPager viewPager;
-    private FloatingActionButton floatingActionButton;
-    private FloatingActionButton floatingActionButtonDirection;
     private boolean showFAB = true;
 
     @Override
@@ -62,14 +61,40 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 
         // TODO: 3/30/16 Hiếu - khi mở, app sẽ xét xem mình có mở GPS chưa, nếu chưa thì app sẽ hiện 1 hộp thoại "Dialog" yêu cầu người dùng mở GPS, ông sẽ hiện thực hộp thoại này
 
-        // Phong - when click fab, zoom to user's location
-        declareFAB();
-
-        // search view
-        declareSearchView();
+        declareView();
     }
 
-    private void declareSearchView() {
+    private void declareView() {
+        // fab
+        final FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab_my_location);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isGoogleConnected()) {
+                    if (ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                    // when click, remove old maker, add new marker
+                    mMapView.getOverlays().clear();
+
+                    Location userCurrentLocation = getLocation();
+                    setMarkerAtLocation(userCurrentLocation, R.drawable.ic_face_black_24dp);
+                } else {
+                    Log.i(TAG, "onClick: GoogleApi not connect");
+                }
+            }
+        });
+
+        // if click, go to another activity
+        final FloatingActionButton floatingActionButtonDirection = (FloatingActionButton) findViewById(R.id.fab_direction);
+        floatingActionButtonDirection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplication(), DirectionActivity.class);
+                startActivity(intent);
+            }
+        });
+
         // To handle FAB animation upon entrance and exit
         final Animation growAnimation = AnimationUtils.loadAnimation(this, R.anim.simple_grow);
         final Animation shrinkAnimation = AnimationUtils.loadAnimation(this, R.anim.simple_shrink);
@@ -196,30 +221,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
-    }
-
-
-    private void declareFAB() {
-        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab_my_location);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isGoogleConnected()) {
-                    if (ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
-                    // when click, remove old maker, add new marker
-                    mMapView.getOverlays().clear();
-
-                    Location userCurrentLocation = getLocation();
-                    setMarkerAtLocation(userCurrentLocation, R.drawable.ic_face_black_24dp);
-                } else {
-                    Log.i(TAG, "onClick: GoogleApi not connect");
-                }
-            }
-        });
-
-        floatingActionButtonDirection = (FloatingActionButton) findViewById(R.id.fab_direction);
     }
 
     // add a google photo to google image view.
