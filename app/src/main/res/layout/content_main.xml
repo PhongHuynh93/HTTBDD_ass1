@@ -55,6 +55,8 @@
                 android:paddingRight="56dp">
 
                 <TextView
+                    android:inputType="text"
+                    android:maxLines="1"
                     android:id="@+id/place_name"
                     style="@style/TextAppearance.AppCompat.Headline"
                     android:layout_width="match_parent"
@@ -161,7 +163,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_menu_directions"
         android:tint="@color/colorAccent"
-        app:backgroundTint="@color/colorBlue"
+        app:backgroundTint="@color/colorPrimary"
         app:layout_anchor="@id/map_bottom_sheets"
         app:layout_anchorGravity="top|start" />
     <!--here location fab-->
