@@ -101,12 +101,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             Intent intent = new Intent(this, ShareActivity.class);
             startActivity(intent);
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.facebook) {
             // TODO: 3/30/16 Hiếu: Khi click vào thì hiện thực Facebook log in.
-
-        } else if (id == R.id.nav_manage) {
-            // TODO: 3/30/16 Hiếu: Khi click vào thì hiện thực Facebook log out.
-
+            Intent intent = new Intent(this, FacebookLoginActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
