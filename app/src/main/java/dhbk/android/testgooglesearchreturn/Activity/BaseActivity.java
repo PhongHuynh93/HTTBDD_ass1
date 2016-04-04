@@ -1,4 +1,4 @@
-package dhbk.android.testgooglesearchreturn;
+package dhbk.android.testgooglesearchreturn.Activity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -26,6 +27,8 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
+import dhbk.android.testgooglesearchreturn.R;
+
 
 /**
  * Created by huynhducthanhphong on 3/30/16.
@@ -44,6 +47,17 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         return mIMapController;
     }
 
+    public GoogleApiClient getmGoogleApiClient() {
+        return mGoogleApiClient;
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // declare google api
+        buildGoogleApiClient();
+    }
+
     // Phong - after onCreate() get called, onPostCreate was called to declare nav.
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -52,9 +66,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         if (navigationView != null) {
             navigationView.setNavigationItemSelectedListener(this);
         }
-        // connect to google api
-        buildGoogleApiClient();
+
     }
+
+
 
     private void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient
@@ -86,12 +101,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             Intent intent = new Intent(this, ShareActivity.class);
             startActivity(intent);
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.facebook) {
             // TODO: 3/30/16 Hiếu: Khi click vào thì hiện thực Facebook log in.
-
-        } else if (id == R.id.nav_manage) {
-            // TODO: 3/30/16 Hiếu: Khi click vào thì hiện thực Facebook log out.
-
+            Intent intent = new Intent(this, FacebookLoginActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
