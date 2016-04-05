@@ -81,7 +81,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
                 .build();
     }
 
-    // TODO: 3/30/16 Hiếu: fix lại nội dung navigation drawer
     // Phong - called when select 1 item in nav.
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -102,7 +101,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             startActivity(intent);
 
         } else if (id == R.id.facebook) {
-            // TODO: 3/30/16 Hiếu: Khi click vào thì hiện thực Facebook log in.
             Intent intent = new Intent(this, FacebookLoginActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_share) {
