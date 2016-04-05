@@ -21,12 +21,30 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.bonuspack.overlays.Polyline;
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import dhbk.android.testgooglesearchreturn.ClassHelp.Constant;
 import dhbk.android.testgooglesearchreturn.R;
 
 
@@ -68,7 +86,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         }
 
     }
-
 
 
     private void buildGoogleApiClient() {
@@ -174,4 +191,132 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             Log.i(TAG, "onClick: Not determine your current location");
         }
     }
+
+    // phong - make a URL to Google to get direction.
+    public String makeURL(double sourcelat, double sourcelog, double destlat, double destlog, String travelMode) {
+        StringBuilder urlString = new StringBuilder();
+        urlString.append("http://maps.googleapis.com/maps/api/directions/json");
+        urlString.append("?origin=");// from
+        urlString.append(Double.toString(sourcelat));
+        urlString.append(",");
+        urlString.append(Double.toString(sourcelog));
+        urlString.append("&destination=");// to
+        urlString.append(Double.toString(destlat));
+        urlString.append(",");
+        urlString.append(Double.toString(destlog));
+        urlString.append("&mode=" + travelMode + "&alternatives=true");
+        urlString.append("&key=" + Constant.GOOGLE_SERVER_KEY);
+        return urlString.toString();
+    }
+
+    // phong - get JSON reponse from a URL
+    public String getJSONFromUrl(String url) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        // request
+        URL url1 = null;
+        try {
+            url1 = new URL(url);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        HttpURLConnection connection = null;
+        try {
+            assert url1 != null;
+            connection = (HttpURLConnection) url1.openConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            assert connection != null;
+            connection.setRequestMethod("GET");
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        }
+
+        // read the response
+        try {
+            if (connection.getResponseCode() == 201 || connection.getResponseCode() == 200) {
+                InputStream inputStream = connection.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    stringBuilder.append(line);
+                }
+                inputStream.close();
+            }
+        } catch (IOException e) {
+            Log.e(getClass().getSimpleName(), "Error in request");
+        }
+
+        return stringBuilder.toString();
+    }
+
+    // phong - draw path from JSON reponse
+    public void drawPath(String result, int color, float width) {
+        ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>(); // tao 1 array cac toạ dộ
+
+        try {
+            final JSONObject json = new JSONObject(result); // lưu JSON mà server trả
+            JSONArray routeArray = json.getJSONArray("routes");
+            JSONObject routes = routeArray.getJSONObject(0);
+            JSONObject overviewPolylines = routes
+                    .getJSONObject("overview_polyline"); // duong di cua google
+
+            String encodedString = overviewPolylines.getString("points"); // lấy value với key là "point"
+            List<GeoPoint> list = decodePoly(encodedString); // hàm này return 1 list Geopoint doc  đường đi
+
+            for (int z = 0; z < list.size() - 1; z++) {
+                GeoPoint src = list.get(z);
+                waypoints.add(src);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        RoadManager roadManager = new OSRMRoadManager(getApplicationContext());
+        Road road = roadManager.getRoad(waypoints);
+
+        Polyline roadOverlay = RoadManager.buildRoadOverlay(road, color, width, getApplicationContext());
+
+        mMapView.getOverlays().add(roadOverlay);
+        mMapView.invalidate();
+    }
+
+    // phong - method to return a list of point from JSON.
+    private List<GeoPoint> decodePoly(String encoded) {
+        List<GeoPoint> poly = new ArrayList<GeoPoint>(); // list geopoint
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            GeoPoint p = new GeoPoint((((double) lat / 1E5)),
+                    (((double) lng / 1E5)));
+            poly.add(p);
+        }
+
+        return poly;
+    }
+
 }
