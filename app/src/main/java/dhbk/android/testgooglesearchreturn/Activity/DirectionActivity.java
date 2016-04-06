@@ -1,6 +1,7 @@
 package dhbk.android.testgooglesearchreturn.Activity;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
@@ -25,12 +26,17 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
+import org.osmdroid.api.IMapController;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+
+import dhbk.android.testgooglesearchreturn.ClassHelp.Constant;
 import dhbk.android.testgooglesearchreturn.R;
 
 /**
  * Created by huynhducthanhphong on 4/3/16.
  */
-public class DirectionActivity extends BaseActivity{
+public class DirectionActivity extends BaseActivity {
     private static final int REQUEST_CODE_AUTOCOMPLETE_EDITTEXT_1 = 1;
     private static final int REQUEST_CODE_AUTOCOMPLETE_EDITTEXT_2 = 2;
     private static final String TAG = DirectionActivity.class.getName();
@@ -38,6 +44,9 @@ public class DirectionActivity extends BaseActivity{
     private EditText mEndPoint;
     private BottomBar mBottomBar;
     private Toolbar mToolbar;
+    private MapView mMapView;
+    private Location destinationPlace;
+    private Location startPlace;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,16 +58,25 @@ public class DirectionActivity extends BaseActivity{
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         makeMapDefaultSetting();
+        mMapView = getMapView();
 
         declareFab();
 
+        if (MainActivity.mPlace != null) {
+            destinationPlace = new Location("destinationPlace");
+            destinationPlace.setLatitude(MainActivity.mPlace.getLatLng().latitude);
+            destinationPlace.setLongitude(MainActivity.mPlace.getLatLng().longitude);
+        }
+        startPlace = getLocation();
+        Log.i(TAG, "onCreate: startPlace " + startPlace);
+
         declareBottomNavigation(savedInstanceState);
 
-
+        // TODO: 4/6/16 phong - test trường hợp 2 thanh search
     }
 
     private void declareFab() {
-        mStartPoint = (EditText)findViewById(R.id.start_point);
+        mStartPoint = (EditText) findViewById(R.id.start_point);
         assert mStartPoint != null;
         mStartPoint.setText(R.string.yourLocation);
         mStartPoint.setOnClickListener(new View.OnClickListener() {
@@ -68,10 +86,10 @@ public class DirectionActivity extends BaseActivity{
                 openAutocompleteActivity(REQUEST_CODE_AUTOCOMPLETE_EDITTEXT_1);
             }
         });
-        mEndPoint = (EditText)findViewById(R.id.end_point);
-        if (MainActivity.mPlaceName != null) {
+        mEndPoint = (EditText) findViewById(R.id.end_point);
+        if (MainActivity.mPlace != null) {
             assert mEndPoint != null;
-            mEndPoint.setText(MainActivity.mPlaceName);
+            mEndPoint.setText(MainActivity.mPlace.getName());
         }
         mEndPoint.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,6 +101,7 @@ public class DirectionActivity extends BaseActivity{
 
     }
 
+    // phong - khung chứa 4 icons phương tiện.
     private void declareBottomNavigation(Bundle savedInstanceState) {
         mBottomBar = BottomBar.attach(findViewById(R.id.map), savedInstanceState);
 
@@ -91,17 +110,45 @@ public class DirectionActivity extends BaseActivity{
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarItemRun) {
                     mToolbar.setBackgroundColor(getResources().getColor(R.color.bot1));
-                } else  if (menuItemId == R.id.bottomBarItemBike) {
+                    drawNewPath(Constant.MODE_RUN);
+
+                } else if (menuItemId == R.id.bottomBarItemBike) {
                     mToolbar.setBackgroundColor(getResources().getColor(R.color.bot2));
-                } else  if (menuItemId == R.id.bottomBarItemBus) {
+                    drawNewPath(Constant.MODE_BIKE);
+
+
+                } else if (menuItemId == R.id.bottomBarItemBus) {
                     mToolbar.setBackgroundColor(getResources().getColor(R.color.bot3));
-                } else  if (menuItemId == R.id.bottomBarItemCar) {
+                    drawNewPath(Constant.MODE_BUS);
+
+
+                } else if (menuItemId == R.id.bottomBarItemCar) {
                     mToolbar.setBackgroundColor(getResources().getColor(R.color.bot4));
+                    drawNewPath(Constant.MODE_CAR);
+
                 }
             }
 
             @Override
             public void onMenuTabReSelected(@IdRes int menuItemId) {
+                if (menuItemId == R.id.bottomBarItemRun) {
+                    mToolbar.setBackgroundColor(getResources().getColor(R.color.bot1));
+                    drawNewPath(Constant.MODE_RUN);
+
+                } else if (menuItemId == R.id.bottomBarItemBike) {
+                    mToolbar.setBackgroundColor(getResources().getColor(R.color.bot2));
+                    drawNewPath(Constant.MODE_BIKE);
+
+
+                } else if (menuItemId == R.id.bottomBarItemBus) {
+                    mToolbar.setBackgroundColor(getResources().getColor(R.color.bot3));
+                    drawNewPath(Constant.MODE_BUS);
+
+
+                } else if (menuItemId == R.id.bottomBarItemCar) {
+                    mToolbar.setBackgroundColor(getResources().getColor(R.color.bot4));
+                    drawNewPath(Constant.MODE_CAR);
+                }
             }
         });
 
@@ -111,6 +158,20 @@ public class DirectionActivity extends BaseActivity{
         mBottomBar.mapColorForTab(1, "#7B1FA2");//"#7B1FA2");
         mBottomBar.mapColorForTab(2, "#FF5252");//"#FF5252");
         mBottomBar.mapColorForTab(3, "#FF9800");//"#FF9800"  );
+    }
+
+    // xóa overlay + vẽ + phóng to
+    private void drawNewPath(String mode) {
+        // xóa overlay + vẽ + phóng to
+        Log.i(TAG, "drawNewPath: startplace " + startPlace);
+        Log.i(TAG, "drawNewPath: destplace " + destinationPlace);
+        if (startPlace != null && destinationPlace != null) {
+            GeoPoint userCurrentPoint = new GeoPoint(startPlace.getLatitude(), startPlace.getLongitude());
+            mMapView.getController().setCenter(userCurrentPoint);
+            mMapView.getController().zoomTo(Constant.ZOOM);
+            mMapView.getOverlays().clear();
+            drawPathOSM(startPlace, destinationPlace, mode, Constant.WIDTH_LINE);
+        }
     }
 
     private void openAutocompleteActivity(int code) {
@@ -204,6 +265,5 @@ public class DirectionActivity extends BaseActivity{
         // lose the current tab on orientation change.
         mBottomBar.onSaveInstanceState(outState);
     }
-
 
 }

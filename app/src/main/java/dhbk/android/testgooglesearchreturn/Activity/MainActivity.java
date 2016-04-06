@@ -22,9 +22,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
@@ -41,7 +44,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     private static final String TAG = "MainApp";
     // Map
     private MapView mMapView;
-    private GoogleApiClient mGoogleApiClient;
+    public static GoogleApiClient mGoogleApiClient;
 
     // contain Google photo
     public static ArrayList<PhotoTask.AttributedPhoto> mArrayListAttributedPhoto;
@@ -49,7 +52,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     private boolean showFAB = true;
 
     // place id obtains when search
-    public static CharSequence mPlaceName;
+    public static Place mPlace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +63,11 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
         // Phong - show the map + add 2 zoom button + zoom at a default view point
         makeMapDefaultSetting();
         mMapView = getMapView();
-        mGoogleApiClient = getmGoogleApiClient();
 
         viewPager = (ViewPager) findViewById(R.id.imageSlider);
+
+        // declare google api
+        buildGoogleApiClient();
 
         // TODO: 3/30/16 Hiếu - khi mở, app sẽ xét xem mình có mở GPS chưa, nếu chưa thì app sẽ hiện 1 hộp thoại "Dialog" yêu cầu người dùng mở GPS, ông sẽ hiện thực hộp thoại này
 
@@ -75,7 +80,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isGoogleConnected()) {
+                if (mGoogleApiClient.isConnected()) {
                     if (ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         return;
                     }
@@ -97,6 +102,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
             public void onClick(View v) {
                 // send to Direction activity with place id.
                 Intent intent = new Intent(getApplication(), DirectionActivity.class);
+                // pass place id
+
                 startActivity(intent);
             }
         });
@@ -169,7 +176,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                 Log.i(TAG, "Place Selected: " + place.getAddress());
                 Log.i(TAG, "Place Selected: " + place.getPhoneNumber());
                 Log.i(TAG, "Place Selected: " + place.getWebsiteUri());
-                mPlaceName = place.getName();
+                mPlace = place;
                 // Format the returned place's details and display them in the TextView.
 //                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(), place.getId(),
 //                        place.getAddress(), place.getPhoneNumber(), place.getWebsiteUri()));
@@ -251,6 +258,21 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                 }
             }
         }.execute(new PhotoTask.MyTaskParams(id, mGoogleApiClient));
+    }
+
+    private void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .addApi(LocationServices.API)
+                .enableAutoManage(this, this)
+                .build();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.i(TAG, "onConnectionFailed: ");
     }
 
 }
