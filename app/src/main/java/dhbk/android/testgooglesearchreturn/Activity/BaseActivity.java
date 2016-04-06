@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -51,9 +52,8 @@ import dhbk.android.testgooglesearchreturn.R;
 /**
  * Created by huynhducthanhphong on 3/30/16.
  */
-public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
+public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = BaseActivity.class.getName();
-    private GoogleApiClient mGoogleApiClient;
     private MapView mMapView;
     private IMapController mIMapController;
 
@@ -65,17 +65,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         return mIMapController;
     }
 
-    public GoogleApiClient getmGoogleApiClient() {
-        return mGoogleApiClient;
-    }
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // declare google api
-        buildGoogleApiClient();
-    }
-
     // Phong - after onCreate() get called, onPostCreate was called to declare nav.
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -85,17 +74,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             navigationView.setNavigationItemSelectedListener(this);
         }
 
-    }
-
-
-    private void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient
-                .Builder(this)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .addApi(LocationServices.API)
-                .enableAutoManage(this, this)
-                .build();
     }
 
     // Phong - called when select 1 item in nav.
@@ -145,20 +123,12 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         }
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-
-    public boolean isGoogleConnected() {
-        return mGoogleApiClient.isConnected();
-    }
 
     public Location getLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return null;
         }
-        return LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        return LocationServices.FusedLocationApi.getLastLocation(MainActivity.mGoogleApiClient);
     }
 
     // phong - make default map when opening the activity.
@@ -192,10 +162,17 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         }
     }
 
+    // phong - draw path
+    public void drawPathOSM(Location startPoint, Location destPoint, String travelMode, float width) {
+        String url = makeURL(startPoint.getLatitude(), startPoint.getLongitude(), destPoint.getLatitude(), destPoint.getLongitude(), travelMode);
+        new GetDirection(startPoint, destPoint, url, width).execute();
+    }
+
     // phong - make a URL to Google to get direction.
-    public String makeURL(double sourcelat, double sourcelog, double destlat, double destlog, String travelMode) {
+    @NonNull
+    private String makeURL(double sourcelat, double sourcelog, double destlat, double destlog, String travelMode) {
         StringBuilder urlString = new StringBuilder();
-        urlString.append("http://maps.googleapis.com/maps/api/directions/json");
+        urlString.append("https://maps.googleapis.com/maps/api/directions/json");
         urlString.append("?origin=");// from
         urlString.append(Double.toString(sourcelat));
         urlString.append(",");
@@ -204,13 +181,14 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         urlString.append(Double.toString(destlat));
         urlString.append(",");
         urlString.append(Double.toString(destlog));
-        urlString.append("&mode=" + travelMode + "&alternatives=true");
+        urlString.append("&mode=" + travelMode);
         urlString.append("&key=" + Constant.GOOGLE_SERVER_KEY);
+        Log.i(TAG, "makeURL: " + urlString.toString());
         return urlString.toString();
     }
 
     // phong - get JSON reponse from a URL
-    public String getJSONFromUrl(String url) {
+    private String getJSONFromUrl(String url) {
         StringBuilder stringBuilder = new StringBuilder();
 
         // request
@@ -255,8 +233,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     }
 
     // phong - draw path from JSON reponse
-    public void drawPath(String result, int color, float width) {
-        ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>(); // tao 1 array cac toạ dộ
+    private void drawPath(String result, Location startPlace, Location destPlace, float width) {
+        ArrayList<GeoPoint> waypoints = new ArrayList<>(); // tao 1 array cac toạ dộ
+        GeoPoint startPoint = new GeoPoint(startPlace.getLatitude(), startPlace.getLongitude());
+        waypoints.add(startPoint);
 
         try {
             final JSONObject json = new JSONObject(result); // lưu JSON mà server trả
@@ -268,6 +248,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             String encodedString = overviewPolylines.getString("points"); // lấy value với key là "point"
             List<GeoPoint> list = decodePoly(encodedString); // hàm này return 1 list Geopoint doc  đường đi
 
+
             for (int z = 0; z < list.size() - 1; z++) {
                 GeoPoint src = list.get(z);
                 waypoints.add(src);
@@ -276,11 +257,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             e.printStackTrace();
         }
 
-        RoadManager roadManager = new OSRMRoadManager(getApplicationContext());
-        Road road = roadManager.getRoad(waypoints);
+        GeoPoint destPoint = new GeoPoint(destPlace.getLatitude(), destPlace.getLongitude());
+        waypoints.add(destPoint);
 
-        Polyline roadOverlay = RoadManager.buildRoadOverlay(road, color, width, getApplicationContext());
-
+        Road road = new Road(waypoints);
+        Polyline roadOverlay = RoadManager.buildRoadOverlay(road, Constant.COLOR, width, getApplicationContext());
         mMapView.getOverlays().add(roadOverlay);
         mMapView.invalidate();
     }
@@ -317,6 +298,35 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         }
 
         return poly;
+    }
+
+    // phong - get json from URL
+    private class GetDirection extends AsyncTask<Void, Void, String> {
+        private final Location startPoint;
+        private final Location destPoint;
+        private String url;
+        private float width;
+
+        public GetDirection(Location startPoint, Location destPoint, String url, float width) {
+            this.startPoint = startPoint;
+            this.destPoint = destPoint;
+            this.url = url;
+            this.width = width;
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String json = getJSONFromUrl(this.url);
+            return json;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (result != null) {
+                drawPath(result, this.startPoint, this.destPoint, this.width);
+            }
+        }
     }
 
 }

@@ -11,6 +11,10 @@ public final class Constant {
     public static final String MODE_CAR = "driving";
     public static final String MODE_BUS = "transit";
 
-    // width of lines on map
-    public static final Float WIDTH_LINE = 11.0f;
+    // draw on map
+    public static final Float WIDTH_LINE = 20.0f;
+    public static final int COLOR = 0x8001579B;
+
+    // map zoom
+    public static final int ZOOM = 13;
 }
