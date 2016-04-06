@@ -36,6 +36,6 @@
         android:layout_alignStart="@+id/camera"
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="16dp"
-        android:onClick="startGalleryActivity"
+        android:onClick="startSaveRouteActivity"
         android:src="@android:drawable/ic_lock_power_off" />
 </RelativeLayout>

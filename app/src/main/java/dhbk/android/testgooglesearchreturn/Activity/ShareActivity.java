@@ -220,5 +220,10 @@ public class ShareActivity extends BaseActivity {
         startActivity(intent);
     }
 
+    public void startSaveRouteActivity(View v) {
+        Intent intent = new Intent(this, SaveRouteActivity.class);
+        startActivity(intent);
+    }
+
 
 }

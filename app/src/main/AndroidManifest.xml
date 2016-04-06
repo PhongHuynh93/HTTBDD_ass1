@@ -21,18 +21,20 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCOY2wmdHkHyCIkxpri7UnuhtTFbDP3Ueg" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
 
-        <meta-data android:name="com.facebook.sdk.ApplicationId"
-                   android:value="@string/facebook_app_id"/>
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
-        <activity android:name="com.facebook.FacebookActivity"
-                  android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-                  android:theme="@android:style/Theme.Translucent.NoTitleBar"
-                  android:label="@string/app_name" />
-
-        <provider android:authorities="com.facebook.app.FacebookContentProvider1765631393666272"
-        android:name="com.facebook.FacebookContentProvider"
-        android:exported="true" />
+        <provider
+            android:name="com.facebook.FacebookContentProvider"
+            android:authorities="com.facebook.app.FacebookContentProvider1765631393666272"
+            android:exported="true" />
 
         <activity
             android:name=".Activity.MainActivity"
@@ -44,10 +46,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".Activity.ShareActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ListTripActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -75,6 +76,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".Activity.SaveRouteActivity"></activity>
     </application>
 
 </manifest>
