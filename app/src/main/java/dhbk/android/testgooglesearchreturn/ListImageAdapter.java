@@ -1,7 +1,5 @@
 package dhbk.android.testgooglesearchreturn;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,16 +14,16 @@ import java.io.File;
 /**
  * Created by Thien Nhan on 3/31/2016.
  */
-public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
+public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.ViewHolder> {
     private File[] mImageFile;
 
-    public ListAdapter(File[] holderFile) {
+    public ListImageAdapter(File[] holderFile) {
         mImageFile = holderFile;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_list_trip_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_list_image_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -39,22 +37,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     }
 
-    private void setReductImageSize(ImageView img, String imageFileLocation) {
-        int width = 200;
-        int height = 200;
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(imageFileLocation, options);
-
-        int cameraImageWidth = options.outWidth;
-        int cameraImageHeight = options.outHeight;
-        int scaleFactor = Math.min(cameraImageHeight / width, cameraImageHeight / height);
-
-        options.inSampleSize = scaleFactor;
-        options.inJustDecodeBounds = false;
-        Bitmap bmp = BitmapFactory.decodeFile(imageFileLocation, options);
-        img.setImageBitmap(bmp);
-    }
 
     @Override
     public int getItemCount() {

@@ -31,7 +31,7 @@ public class ListTripActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(layoutManager);
 
-        RecyclerView.Adapter imageAdapter = new ListAdapter(sortFile(galleryFoler));
+        RecyclerView.Adapter imageAdapter = new ListImageAdapter(sortFile(galleryFoler));
         recyclerView.setAdapter(imageAdapter);
     }
 

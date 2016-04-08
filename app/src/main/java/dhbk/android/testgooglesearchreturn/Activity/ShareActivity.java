@@ -43,7 +43,7 @@ public class ShareActivity extends BaseActivity {
     private static final int ACTIVITY_CAMERA_APP = 0;
     // private static final String GALLERY_LOCATION = "tripGallery" + new SimpleDateFormat("ydM_Hms").format(new Date()); // name of the folder gallery
     //TODO: Nhân - đặt tên folder gallery hợp lí
-    private static final String GALLERY_LOCATION = "tripGallery2016313_232723";
+    private static final String GALLERY_LOCATION = "tripGallery";
     LocationManager locationManager;
     RoadManager roadManager = new OSRMRoadManager(this);
     ArrayList<GeoPoint> route;
@@ -187,7 +187,7 @@ public class ShareActivity extends BaseActivity {
 
             //setReductImageSize();
 
-//            RecyclerView.Adapter newImageAdapter= new ListAdapter(sortFile(galleryFoler));
+//            RecyclerView.Adapter newImageAdapter= new ListImageAdapter(sortFile(galleryFoler));
 //            recyclerView.swapAdapter(newImageAdapter,false);
         }
     }
