@@ -50,7 +50,7 @@
             android:name=".Activity.ShareActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ListTripActivity"
+            android:name=".ClassHelp.ListTripActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

@@ -33,7 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import dhbk.android.testgooglesearchreturn.ListTripActivity;
+import dhbk.android.testgooglesearchreturn.ClassHelp.ListTripActivity;
 import dhbk.android.testgooglesearchreturn.R;
 
 
@@ -221,8 +221,27 @@ public class ShareActivity extends BaseActivity {
     }
 
     public void startSaveRouteActivity(View v) {
-        Intent intent = new Intent(this, SaveRouteActivity.class);
-        startActivity(intent);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        } else {
+            locationManager.removeUpdates(locationListenerGPS);
+            Intent intent = new Intent(this, SaveRouteActivity.class);
+            startActivity(intent);
+            //TODO: Kiem tra thong tin lo trinh
+//            if(route.size()>2){
+//                Gson gson=new Gson();
+//                String routeJSON=gson.toJson(route);
+//                Bundle bundle=new Bundle();
+//                bundle.putString("routeJSON",routeJSON);
+//                Intent intent = new Intent(this, SaveRouteActivity.class);
+//                intent.putExtras(bundle);
+//                startActivity(intent);
+//            }else{
+//                Toast.makeText(this," Chua co thong tin lo trinh  ",Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+        }
+
     }
 
 

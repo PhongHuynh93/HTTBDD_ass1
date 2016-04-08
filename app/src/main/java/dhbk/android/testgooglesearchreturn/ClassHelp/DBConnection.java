@@ -16,7 +16,7 @@ import java.util.List;
 public class DBConnection extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "map";
     public static final String DATABASE_TABLE = "list_trip";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
     public DBConnection(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -24,8 +24,9 @@ public class DBConnection extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String create_table = "create table " + DATABASE_NAME +
-                "(id integer primary key AUTOINCREMENT , name text, description text, image text)";
+        String create_table = "create table " + DATABASE_TABLE +
+                "(id integer primary key AUTOINCREMENT , name text, description text,route text ,image text)";
+        db.execSQL(create_table);
     }
 
     @Override
@@ -40,6 +41,7 @@ public class DBConnection extends SQLiteOpenHelper {
         values.put("name", info.getName());
         values.put("description", info.getDescription());
         values.put("image", info.getImg());
+        values.put("route", info.getRoute());
         db.insert(DATABASE_TABLE, null, values);
         db.close();
     }

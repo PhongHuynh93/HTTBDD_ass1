@@ -4,20 +4,29 @@ package dhbk.android.testgooglesearchreturn.ClassHelp;
  * Created by Thien Nhan on 4/7/2016.
  */
 public class RouteInfo {
-    public String name;
-    public String description;
-    public String img;
+    private String name;
+    private String description;
+    private String img;
+    private String route;
+
 
     public RouteInfo() {
-
     }
 
-    public RouteInfo(String name, String description, String img) {
+    public RouteInfo(String name, String description, String img, String route) {
         this.name = name;
         this.description = description;
         this.img = img;
+        this.route = route;
     }
 
+    public String getRoute() {
+        return route;
+    }
+
+    public void setRoute(String route) {
+        this.route = route;
+    }
     public String getImg() {
         return img;
     }

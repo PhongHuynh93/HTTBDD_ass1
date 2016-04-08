@@ -19,8 +19,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import dhbk.android.testgooglesearchreturn.ClassHelp.DBConnection;
+import dhbk.android.testgooglesearchreturn.ClassHelp.ListImageAdapter;
 import dhbk.android.testgooglesearchreturn.ClassHelp.RecyclerViewItemClickListner;
-import dhbk.android.testgooglesearchreturn.ListImageAdapter;
+import dhbk.android.testgooglesearchreturn.ClassHelp.RouteInfo;
 import dhbk.android.testgooglesearchreturn.R;
 
 public class SaveRouteActivity extends AppCompatActivity {
@@ -99,9 +101,10 @@ public class SaveRouteActivity extends AppCompatActivity {
         String name = nameRoute.getText().toString();
         String description = descript.getText().toString();
         Gson gson = new Gson();
-        String jsonFavorites = gson.toJson(arraySelectedFile);
-        Log.d("@@", jsonFavorites);
-
+        String img = gson.toJson(arraySelectedFile);
+        DBConnection dbConnection = new DBConnection(this);
+        dbConnection.addTrip(new RouteInfo(name, description, img, "route"));
+        Log.d("@@", "Success");
     }
 
 }
