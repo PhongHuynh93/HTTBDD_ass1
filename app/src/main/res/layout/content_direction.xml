@@ -95,6 +95,7 @@
         android:src="@android:drawable/ic_menu_mylocation"
         android:tint="@color/colorPrimaryDark"
         app:layout_anchor="@id/toolbar"
-        app:layout_anchorGravity="bottom|end" />
+        app:layout_anchorGravity="bottom|end"
+        android:onClick="onClickFab"/>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -43,6 +43,7 @@ public abstract class PhotoTask extends AsyncTask<PhotoTask.MyTaskParams, Void, 
     public class AttributedPhoto {
         public final CharSequence attribution;
         public final Bitmap bitmap;
+
         public AttributedPhoto(CharSequence attribution, Bitmap bitmap) {
             this.attribution = attribution;
             this.bitmap = bitmap;
@@ -77,8 +78,15 @@ public abstract class PhotoTask extends AsyncTask<PhotoTask.MyTaskParams, Void, 
             Log.i(TAG, "doInBackground: Ket noi thanh cong google photo");
 
             if (photoMetadataBuffer.getCount() > 0 && !isCancelled()) {
+
                 int countPhoto = photoMetadataBuffer.getCount();
+
+                if (countPhoto > 3) {
+                    countPhoto = 3;
+                }
+
                 while(countPhoto > 0) {
+                    Log.i(TAG, "doInBackground: isCancelled" + isCancelled());
                     Log.i(TAG, "doInBackground: đã có image " + countPhoto);
 
                     // Get the first bitmap and its attributions.

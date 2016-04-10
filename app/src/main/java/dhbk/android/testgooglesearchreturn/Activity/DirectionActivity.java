@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -27,6 +28,7 @@ import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
@@ -53,6 +55,7 @@ public class DirectionActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_direction);
 
+
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -60,22 +63,39 @@ public class DirectionActivity extends BaseActivity {
         makeMapDefaultSetting();
         mMapView = getMapView();
 
-        declareFab();
+        declareSearch();
 
+        // set dest place
         if (MainActivity.mPlace != null) {
-            destinationPlace = new Location("destinationPlace");
-            destinationPlace.setLatitude(MainActivity.mPlace.getLatLng().latitude);
-            destinationPlace.setLongitude(MainActivity.mPlace.getLatLng().longitude);
+            Location place = new Location("destinationPlace");
+            place.setLatitude(MainActivity.mPlace.getLatLng().latitude);
+            place.setLongitude(MainActivity.mPlace.getLatLng().longitude);
+            setDestinationPlace(place);
         }
-        startPlace = getLocation();
-        Log.i(TAG, "onCreate: startPlace " + startPlace);
+
+        // set startplace
+        if (startPlace == null) {
+            Location place = getLocation();
+            setStartPlace(place);
+            Log.i(TAG, "onClick onCreate: " + MainActivity.mGoogleApiClient.isConnected());
+
+        }
 
         declareBottomNavigation(savedInstanceState);
 
-        // TODO: 4/6/16 phong - test trường hợp 2 thanh search
     }
 
-    private void declareFab() {
+    public void onClickFab(View view) {
+        Log.i(TAG, "onClick: fab " + MainActivity.mGoogleApiClient.isConnected());
+        Location place = getLocation();
+        setStartPlace(place);
+        Log.i(TAG, "onClick: fab " + MainActivity.mGoogleApiClient.isConnected());
+        // change edit text
+        mStartPoint.setText(R.string.yourLocation);
+        drawNewPathOnTab();
+    }
+
+    private void declareSearch() {
         mStartPoint = (EditText) findViewById(R.id.start_point);
         assert mStartPoint != null;
         mStartPoint.setText(R.string.yourLocation);
@@ -99,6 +119,8 @@ public class DirectionActivity extends BaseActivity {
             }
         });
 
+        Log.i(TAG, "onClick: declareSearch " + MainActivity.mGoogleApiClient.isConnected());
+
     }
 
     // phong - khung chứa 4 icons phương tiện.
@@ -109,20 +131,29 @@ public class DirectionActivity extends BaseActivity {
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarItemRun) {
+                    MainActivity.mGoogleApiClient.connect();
+                    Log.i(TAG, "onClick: botnav " + MainActivity.mGoogleApiClient.isConnected());
+
                     mToolbar.setBackgroundColor(getResources().getColor(R.color.bot1));
                     drawNewPath(Constant.MODE_RUN);
 
                 } else if (menuItemId == R.id.bottomBarItemBike) {
+                    Log.i(TAG, "onClick: botnav " + MainActivity.mGoogleApiClient.isConnected());
+
                     mToolbar.setBackgroundColor(getResources().getColor(R.color.bot2));
                     drawNewPath(Constant.MODE_BIKE);
 
 
                 } else if (menuItemId == R.id.bottomBarItemBus) {
+                    Log.i(TAG, "onClick: botnav " + MainActivity.mGoogleApiClient.isConnected());
+
                     mToolbar.setBackgroundColor(getResources().getColor(R.color.bot3));
                     drawNewPath(Constant.MODE_BUS);
 
 
                 } else if (menuItemId == R.id.bottomBarItemCar) {
+                    Log.i(TAG, "onClick: botnav " + MainActivity.mGoogleApiClient.isConnected());
+
                     mToolbar.setBackgroundColor(getResources().getColor(R.color.bot4));
                     drawNewPath(Constant.MODE_CAR);
 
@@ -132,6 +163,8 @@ public class DirectionActivity extends BaseActivity {
             @Override
             public void onMenuTabReSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarItemRun) {
+                    MainActivity.mGoogleApiClient.connect();
+
                     mToolbar.setBackgroundColor(getResources().getColor(R.color.bot1));
                     drawNewPath(Constant.MODE_RUN);
 
@@ -162,15 +195,31 @@ public class DirectionActivity extends BaseActivity {
 
     // xóa overlay + vẽ + phóng to
     private void drawNewPath(String mode) {
-        // xóa overlay + vẽ + phóng to
-        Log.i(TAG, "drawNewPath: startplace " + startPlace);
-        Log.i(TAG, "drawNewPath: destplace " + destinationPlace);
         if (startPlace != null && destinationPlace != null) {
-            GeoPoint userCurrentPoint = new GeoPoint(startPlace.getLatitude(), startPlace.getLongitude());
-            mMapView.getController().setCenter(userCurrentPoint);
-            mMapView.getController().zoomTo(Constant.ZOOM);
             mMapView.getOverlays().clear();
-            drawPathOSM(startPlace, destinationPlace, mode, Constant.WIDTH_LINE);
+            drawPathOSMWithInstruction(startPlace, destinationPlace, mode, Constant.WIDTH_LINE);
+        }
+    }
+
+
+    // phong draw path depends on current tab
+    private void drawNewPathOnTab() {
+        switch (mBottomBar.getCurrentTabPosition()) {
+            case 0:
+                Log.i(TAG, "onActivityResult: bạn chon chạy");
+                drawNewPath(Constant.MODE_RUN);
+                break;
+            case 1:
+                drawNewPath(Constant.MODE_BIKE);
+                break;
+            case 2:
+                drawNewPath(Constant.MODE_BUS);
+                break;
+            case 3:
+                drawNewPath(Constant.MODE_CAR);
+                break;
+            default:
+                Log.i(TAG, "onActivityResult: error when choose tab");
         }
     }
 
@@ -208,19 +257,15 @@ public class DirectionActivity extends BaseActivity {
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 Log.i(TAG, "Place Selected: " + place.getName());
                 mStartPoint.setText(place.getName());
+                // set startPlace
+                Location startPlace = new Location("location");
+                startPlace.setLatitude(place.getLatLng().latitude);
+                startPlace.setLongitude(place.getLatLng().longitude);
+                setStartPlace(startPlace);
 
-                // Format the place's details and display them in the TextView.
-//                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),
-//                        place.getId(), place.getAddress(), place.getPhoneNumber(),
-//                        place.getWebsiteUri()));
-//
-//                // Display attributions if required.
-//                CharSequence attributions = place.getAttributions();
-//                if (!TextUtils.isEmpty(attributions)) {
-//                    mPlaceAttribution.setText(Html.fromHtml(attributions.toString()));
-//                } else {
-//                    mPlaceAttribution.setText("");
-//                }
+                //drawpath
+                drawNewPathOnTab();
+
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
                 Log.e(TAG, "Error: Status = " + status.toString());
@@ -235,18 +280,15 @@ public class DirectionActivity extends BaseActivity {
                 Log.i(TAG, "Place Selected: " + place.getName());
                 mEndPoint.setText(place.getName());
 
-                // Format the place's details and display them in the TextView.
-//                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),
-//                        place.getId(), place.getAddress(), place.getPhoneNumber(),
-//                        place.getWebsiteUri()));
-//
-//                // Display attributions if required.
-//                CharSequence attributions = place.getAttributions();
-//                if (!TextUtils.isEmpty(attributions)) {
-//                    mPlaceAttribution.setText(Html.fromHtml(attributions.toString()));
-//                } else {
-//                    mPlaceAttribution.setText("");
-//                }
+                // set dest
+                Location destPlace = new Location("location");
+                destPlace.setLatitude(place.getLatLng().latitude);
+                destPlace.setLongitude(place.getLatLng().longitude);
+                setDestinationPlace(destPlace);
+
+                // draw path
+                drawNewPathOnTab();
+
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
                 Log.e(TAG, "Error: Status = " + status.toString());
@@ -257,6 +299,7 @@ public class DirectionActivity extends BaseActivity {
         }
     }
 
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -264,6 +307,14 @@ public class DirectionActivity extends BaseActivity {
         // Necessary to restore the BottomBar's state, otherwise we would
         // lose the current tab on orientation change.
         mBottomBar.onSaveInstanceState(outState);
+    }
+
+    public void setDestinationPlace(Location destinationPlace) {
+        this.destinationPlace = destinationPlace;
+    }
+
+    public void setStartPlace(Location startPlace) {
+        this.startPlace = startPlace;
     }
 
 }
