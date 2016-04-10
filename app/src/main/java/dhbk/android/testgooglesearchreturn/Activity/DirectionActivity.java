@@ -63,12 +63,19 @@ public class DirectionActivity extends BaseActivity {
 
         declareFab();
 
+        // set dest place
         if (MainActivity.mPlace != null) {
-            destinationPlace = new Location("destinationPlace");
-            destinationPlace.setLatitude(MainActivity.mPlace.getLatLng().latitude);
-            destinationPlace.setLongitude(MainActivity.mPlace.getLatLng().longitude);
+            Location place = new Location("destinationPlace");
+            place.setLatitude(MainActivity.mPlace.getLatLng().latitude);
+            place.setLongitude(MainActivity.mPlace.getLatLng().longitude);
+            setDestinationPlace(place);
         }
-        startPlace = getLocation();
+
+        // set startplace
+        if (startPlace == null) {
+            Location place = getLocation();
+            setStartPlace(place);
+        }
 
         declareBottomNavigation(savedInstanceState);
 
@@ -162,15 +169,9 @@ public class DirectionActivity extends BaseActivity {
 
     // xóa overlay + vẽ + phóng to
     private void drawNewPath(String mode) {
-        // xóa overlay + vẽ + phóng to
-        Log.i(TAG, "drawNewPath: startplace " + startPlace);
-        Log.i(TAG, "drawNewPath: destplace " + destinationPlace);
         if (startPlace != null && destinationPlace != null) {
-            GeoPoint userCurrentPoint = new GeoPoint(startPlace.getLatitude(), startPlace.getLongitude());
             mMapView.getOverlays().clear();
             drawPathOSMWithInstruction(startPlace, destinationPlace, mode, Constant.WIDTH_LINE);
-//            mMapView.getController().setCenter(userCurrentPoint);
-//            mMapView.getController().zoomTo(Constant.ZOOM);
         }
     }
 
@@ -208,19 +209,30 @@ public class DirectionActivity extends BaseActivity {
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 Log.i(TAG, "Place Selected: " + place.getName());
                 mStartPoint.setText(place.getName());
+                // set startPlace
+                Location startPlace = new Location("location");
+                startPlace.setLatitude(place.getLatLng().latitude);
+                startPlace.setLongitude(place.getLatLng().longitude);
+                setStartPlace(startPlace);
+                //drawpath
+                switch (mBottomBar.getCurrentTabPosition()) {
+                    case 0:
+                        Log.i(TAG, "onActivityResult: bạn chon chạy");
+                        drawNewPath(Constant.MODE_RUN);
+                        break;
+                    case 1:
+                        drawNewPath(Constant.MODE_BIKE);
+                        break;
+                    case 2:
+                        drawNewPath(Constant.MODE_BUS);
+                        break;
+                    case 3:
+                        drawNewPath(Constant.MODE_CAR);
+                        break;
+                    default:
+                        Log.i(TAG, "onActivityResult: error when choose tab");
+                }
 
-                // Format the place's details and display them in the TextView.
-//                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),
-//                        place.getId(), place.getAddress(), place.getPhoneNumber(),
-//                        place.getWebsiteUri()));
-//
-//                // Display attributions if required.
-//                CharSequence attributions = place.getAttributions();
-//                if (!TextUtils.isEmpty(attributions)) {
-//                    mPlaceAttribution.setText(Html.fromHtml(attributions.toString()));
-//                } else {
-//                    mPlaceAttribution.setText("");
-//                }
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
                 Log.e(TAG, "Error: Status = " + status.toString());
@@ -235,18 +247,31 @@ public class DirectionActivity extends BaseActivity {
                 Log.i(TAG, "Place Selected: " + place.getName());
                 mEndPoint.setText(place.getName());
 
-                // Format the place's details and display them in the TextView.
-//                mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),
-//                        place.getId(), place.getAddress(), place.getPhoneNumber(),
-//                        place.getWebsiteUri()));
-//
-//                // Display attributions if required.
-//                CharSequence attributions = place.getAttributions();
-//                if (!TextUtils.isEmpty(attributions)) {
-//                    mPlaceAttribution.setText(Html.fromHtml(attributions.toString()));
-//                } else {
-//                    mPlaceAttribution.setText("");
-//                }
+                // set dest
+                Location destPlace = new Location("location");
+                destPlace.setLatitude(place.getLatLng().latitude);
+                destPlace.setLongitude(place.getLatLng().longitude);
+                setDestinationPlace(destPlace);
+
+                // draw path
+                switch (mBottomBar.getCurrentTabPosition()) {
+                    case 0:
+                        Log.i(TAG, "onActivityResult: bạn chon chạy");
+                        drawNewPath(Constant.MODE_RUN);
+                        break;
+                    case 1:
+                        drawNewPath(Constant.MODE_BIKE);
+                        break;
+                    case 2:
+                        drawNewPath(Constant.MODE_BUS);
+                        break;
+                    case 3:
+                        drawNewPath(Constant.MODE_CAR);
+                        break;
+                    default:
+                        Log.i(TAG, "onActivityResult: error when choose tab");
+                }
+
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
                 Log.e(TAG, "Error: Status = " + status.toString());
@@ -266,4 +291,11 @@ public class DirectionActivity extends BaseActivity {
         mBottomBar.onSaveInstanceState(outState);
     }
 
+    public void setDestinationPlace(Location destinationPlace) {
+        this.destinationPlace = destinationPlace;
+    }
+
+    public void setStartPlace(Location startPlace) {
+        this.startPlace = startPlace;
+    }
 }

@@ -86,13 +86,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         if (id == R.id.nav_camera) {
             // Handle the Direction Activity
             // Handle the Share Activity
-            Log.i(TAG, "onNavigationItemSelected: Đã chọn activity MainActivity");
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
 
         } else if (id == R.id.nav_gallery) {
-            Log.i(TAG, "onNavigationItemSelected: Đã chọn activity ShareActivity");
-            Log.i(TAG, "onNavigationItemSelected: Đã chọn activity MainActivity");
             Intent intent = new Intent(this, ShareActivity.class);
             startActivity(intent);
 
@@ -139,7 +136,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             mMapView.setTileSource(TileSourceFactory.MAPNIK);
             mMapView.setMultiTouchControls(true);
             mIMapController = mMapView.getController(); // map controller
-            mIMapController.setZoom(10);
+            mIMapController.setZoom(Constant.ZOOM);
             GeoPoint startPoint = new GeoPoint(10.772241, 106.657676);
             mIMapController.setCenter(startPoint);
         }
@@ -167,11 +164,12 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     public void setMarkerAtLocation(Location userCurrentLocation, int icon, String title) {
         if (userCurrentLocation != null) {
             GeoPoint userCurrentPoint = new GeoPoint(userCurrentLocation.getLatitude(), userCurrentLocation.getLongitude());
-            mIMapController.setCenter(userCurrentPoint);
-            mIMapController.zoomTo(mMapView.getMaxZoomLevel());
+//            mIMapController.setCenter(userCurrentPoint);
+//            mIMapController.zoomTo(mMapView.getMaxZoomLevel());
             Marker hereMarker = new Marker(mMapView);
             hereMarker.setPosition(userCurrentPoint);
-            hereMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+//            hereMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            hereMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
             hereMarker.setIcon(ContextCompat.getDrawable(getApplication(), icon));
             hereMarker.setTitle(title);
             mMapView.getOverlays().add(hereMarker);
@@ -264,32 +262,40 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         ArrayList<GeoPoint> waypoints = new ArrayList<>(); // tao 1 array cac toạ dộ
         GeoPoint startPoint = new GeoPoint(startPlace.getLatitude(), startPlace.getLongitude());
         waypoints.add(startPoint);
+        boolean isReturnOK = true;
 
         try {
             final JSONObject json = new JSONObject(result); // lưu JSON mà server trả
             JSONArray routeArray = json.getJSONArray("routes");
-            JSONObject routes = routeArray.getJSONObject(0);
-            JSONObject overviewPolylines = routes
-                    .getJSONObject("overview_polyline"); // duong di cua google
 
-            String encodedString = overviewPolylines.getString("points"); // lấy value với key là "point"
-            List<GeoPoint> list = decodePoly(encodedString); // hàm này return 1 list Geopoint doc  đường đi
+            if (json.getString("status").equals("OK")) {
+                JSONObject routes = routeArray.getJSONObject(0);
+                JSONObject overviewPolylines = routes
+                        .getJSONObject("overview_polyline"); // duong di cua google
+
+                String encodedString = overviewPolylines.getString("points"); // lấy value với key là "point"
+                List<GeoPoint> list = decodePoly(encodedString); // hàm này return 1 list Geopoint doc  đường đi
 
 
-            for (int z = 0; z < list.size() - 1; z++) {
-                GeoPoint src = list.get(z);
-                waypoints.add(src);
+                for (int z = 0; z < list.size() - 1; z++) {
+                    GeoPoint src = list.get(z);
+                    waypoints.add(src);
+                }
+            } else {
+                isReturnOK = false;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        GeoPoint destPoint = new GeoPoint(destPlace.getLatitude(), destPlace.getLongitude());
-        waypoints.add(destPoint);
+        if (isReturnOK) {
+            GeoPoint destPoint = new GeoPoint(destPlace.getLatitude(), destPlace.getLongitude());
+            waypoints.add(destPoint);
 
-        Road road = new Road(waypoints);
-        Polyline roadOverlay = RoadManager.buildRoadOverlay(road, Constant.COLOR, width, getApplicationContext());
-        mMapView.getOverlays().add(roadOverlay);
+            Road road = new Road(waypoints);
+            Polyline roadOverlay = RoadManager.buildRoadOverlay(road, Constant.COLOR, width, getApplicationContext());
+            mMapView.getOverlays().add(roadOverlay);
+        }
         mMapView.invalidate();
     }
 
@@ -300,66 +306,76 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         GeoPoint startPoint = new GeoPoint(startPlace.getLatitude(), startPlace.getLongitude());
         waypoints.add(startPoint);
         ArrayList<JSONObject> stepsArrayObject = null;
+        boolean isReturnOK = true;
 
         try {
             final JSONObject json = new JSONObject(result); // lưu JSON mà server trả
             JSONArray routeArray = json.getJSONArray("routes");
-            JSONObject routes = routeArray.getJSONObject(0);
 
-            JSONObject overviewPolylines = routes
-                    .getJSONObject("overview_polyline"); // duong di cua google
+            if (json.getString("status").equals("OK")) {
 
-            // retrieve step
-            JSONArray legsArray = routes.getJSONArray("legs");
-            JSONObject leg = legsArray.getJSONObject(0);
-            JSONArray stepsArray = leg.getJSONArray("steps");
-            stepsArrayObject = new ArrayList<>();
-            for (int i = 0; i < stepsArray.length(); i++) {
-                Log.i(TAG, "drawPathWithInstruction: i = " + i);
-                stepsArrayObject.add(stepsArray.getJSONObject(i));
+                JSONObject routes = routeArray.getJSONObject(0);
+
+                JSONObject overviewPolylines = routes
+                        .getJSONObject("overview_polyline"); // duong di cua google
+
+                // retrieve step
+                JSONArray legsArray = routes.getJSONArray("legs");
+                JSONObject leg = legsArray.getJSONObject(0);
+                JSONArray stepsArray = leg.getJSONArray("steps");
+                stepsArrayObject = new ArrayList<>();
+                for (int i = 0; i < stepsArray.length(); i++) {
+                    stepsArrayObject.add(stepsArray.getJSONObject(i));
+                }
+
+                String encodedString = overviewPolylines.getString("points"); // lấy value với key là "point"
+                List<GeoPoint> list = decodePoly(encodedString); // hàm này return 1 list Geopoint doc  đường đi
+
+
+                for (int z = 0; z < list.size() - 1; z++) {
+                    GeoPoint src = list.get(z);
+                    waypoints.add(src);
+                }
+            } else {
+                isReturnOK = false;
             }
 
-            String encodedString = overviewPolylines.getString("points"); // lấy value với key là "point"
-            List<GeoPoint> list = decodePoly(encodedString); // hàm này return 1 list Geopoint doc  đường đi
-
-
-            for (int z = 0; z < list.size() - 1; z++) {
-                GeoPoint src = list.get(z);
-                waypoints.add(src);
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        // draw path
-        GeoPoint destPoint = new GeoPoint(destPlace.getLatitude(), destPlace.getLongitude());
-        waypoints.add(destPoint);
+        if (isReturnOK) {
+            // draw path
+            GeoPoint destPoint = new GeoPoint(destPlace.getLatitude(), destPlace.getLongitude());
+            waypoints.add(destPoint);
 
-        Road road = new Road(waypoints);
-        Polyline roadOverlay = RoadManager.buildRoadOverlay(road, Constant.COLOR, width, getApplicationContext());
-        mMapView.getOverlays().add(roadOverlay);
+            Road road = new Road(waypoints);
+            Polyline roadOverlay = RoadManager.buildRoadOverlay(road, Constant.COLOR, width, getApplicationContext());
+            mMapView.getOverlays().add(roadOverlay);
 
 
-        // draw marker on the road
-        for (JSONObject step: stepsArrayObject) {
-            try {
-                // get lat/long of a step
-                JSONObject startLocation = step.getJSONObject("start_location");
-                double lat = Double.parseDouble(startLocation.getString("lat"));
-                double lng = Double.parseDouble(startLocation.getString("lng"));
-                Location stepLocation = new Location("stepLocation");
-                stepLocation.setLatitude(lat);
-                stepLocation.setLongitude(lng);
-                // get instruction
-                String instruction = step.getString("html_instructions");
-                // add marker
-                setMarkerAtLocation(stepLocation, Constant.ICON_INSTRUCTION, instruction);
-            } catch (JSONException e) {
-                e.printStackTrace();
+            // draw marker on the road
+            for (JSONObject step: stepsArrayObject) {
+                try {
+                    // get lat/long of a step
+                    JSONObject startLocation = step.getJSONObject("start_location");
+                    double lat = Double.parseDouble(startLocation.getString("lat"));
+                    double lng = Double.parseDouble(startLocation.getString("lng"));
+                    Location stepLocation = new Location("stepLocation");
+                    stepLocation.setLatitude(lat);
+                    stepLocation.setLongitude(lng);
+                    // get instruction
+                    String instruction = step.getString("html_instructions");
+                    // add marker
+                    setMarkerAtLocation(stepLocation, Constant.ICON_INSTRUCTION, instruction);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             }
-
         }
         mMapView.invalidate();
+
     }
 
 
@@ -413,7 +429,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
 
         @Override
         protected String doInBackground(Void... params) {
-            Log.i(TAG, "doInBackground: lấy json");
             String json = getJSONFromUrl(this.url);
             return json;
         }
@@ -422,13 +437,14 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if (result != null) {
-                Log.i(TAG, "onPostExecute: Vẽ path và phóng to");
-//                draw path and zoom
                 drawPath(result, this.startPoint, this.destPoint, this.width);
-                mMapView.getController().setCenter(new GeoPoint(startPoint.getLatitude(), startPoint.getLongitude()));
-                mMapView.getController().zoomTo(Constant.ZOOM);
+                centerMap(this.startPoint);
             }
         }
+    }
+
+    private void centerMap(Location startPoint) {
+        mMapView.getController().setCenter(new GeoPoint(startPoint.getLatitude(), startPoint.getLongitude()));
     }
 
     // phong - get json from URL
@@ -447,7 +463,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
 
         @Override
         protected String doInBackground(Void... params) {
-            Log.i(TAG, "doInBackground: lấy json");
             String json = getJSONFromUrl(this.url);
             return json;
         }
@@ -456,11 +471,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if (result != null) {
-                Log.i(TAG, "onPostExecute: Vẽ path và phóng to");
-//                draw path and zoom
                 drawPathWithInstruction(result, this.startPoint, this.destPoint, this.width);
-                mMapView.getController().setCenter(new GeoPoint(startPoint.getLatitude(), startPoint.getLongitude()));
-                mMapView.getController().zoomTo(Constant.ZOOM);
+                centerMap(this.startPoint);
             }
         }
     }
