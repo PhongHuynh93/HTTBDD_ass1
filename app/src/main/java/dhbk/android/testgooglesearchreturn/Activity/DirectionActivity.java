@@ -27,6 +27,7 @@ import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
@@ -73,6 +74,7 @@ public class DirectionActivity extends BaseActivity {
         declareBottomNavigation(savedInstanceState);
 
         // TODO: 4/6/16 phong - test trường hợp 2 thanh search
+        Log.i(TAG, "onCreate: ..");
     }
 
     private void declareFab() {
@@ -167,10 +169,10 @@ public class DirectionActivity extends BaseActivity {
         Log.i(TAG, "drawNewPath: destplace " + destinationPlace);
         if (startPlace != null && destinationPlace != null) {
             GeoPoint userCurrentPoint = new GeoPoint(startPlace.getLatitude(), startPlace.getLongitude());
-            mMapView.getController().setCenter(userCurrentPoint);
-            mMapView.getController().zoomTo(Constant.ZOOM);
             mMapView.getOverlays().clear();
             drawPathOSM(startPlace, destinationPlace, mode, Constant.WIDTH_LINE);
+//            mMapView.getController().setCenter(userCurrentPoint);
+//            mMapView.getController().zoomTo(Constant.ZOOM);
         }
     }
 

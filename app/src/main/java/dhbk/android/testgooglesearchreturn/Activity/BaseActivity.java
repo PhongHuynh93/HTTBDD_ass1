@@ -162,6 +162,24 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         }
     }
 
+    // phong - add marker with title
+    public void setMarkerAtLocation(Location userCurrentLocation, int icon, String title) {
+        if (userCurrentLocation != null) {
+            GeoPoint userCurrentPoint = new GeoPoint(userCurrentLocation.getLatitude(), userCurrentLocation.getLongitude());
+            mIMapController.setCenter(userCurrentPoint);
+            mIMapController.zoomTo(mMapView.getMaxZoomLevel());
+            Marker hereMarker = new Marker(mMapView);
+            hereMarker.setPosition(userCurrentPoint);
+            hereMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            hereMarker.setIcon(ContextCompat.getDrawable(getApplication(), icon));
+            hereMarker.setTitle(title);
+            mMapView.getOverlays().add(hereMarker);
+            mMapView.invalidate();
+        } else {
+            Log.i(TAG, "onClick: Not determine your current location");
+        }
+    }
+
     // phong - draw path
     public void drawPathOSM(Location startPoint, Location destPoint, String travelMode, float width) {
         String url = makeURL(startPoint.getLatitude(), startPoint.getLongitude(), destPoint.getLatitude(), destPoint.getLongitude(), travelMode);
@@ -182,6 +200,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         urlString.append(",");
         urlString.append(Double.toString(destlog));
         urlString.append("&mode=" + travelMode);
+        urlString.append("&language=" + Constant.LANGUAGE);
         urlString.append("&key=" + Constant.GOOGLE_SERVER_KEY);
         Log.i(TAG, "makeURL: " + urlString.toString());
         return urlString.toString();
@@ -316,6 +335,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
 
         @Override
         protected String doInBackground(Void... params) {
+            Log.i(TAG, "doInBackground: lấy json");
             String json = getJSONFromUrl(this.url);
             return json;
         }
@@ -324,7 +344,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if (result != null) {
+                Log.i(TAG, "onPostExecute: Vẽ path và phóng to");
+//                draw path and zoom
                 drawPath(result, this.startPoint, this.destPoint, this.width);
+                mMapView.getController().setCenter(new GeoPoint(startPoint.getLatitude(), startPoint.getLongitude()));
+                mMapView.getController().zoomTo(Constant.ZOOM);
             }
         }
     }

@@ -239,7 +239,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 
     // add a google photo to google image view.
     private void addPhotoToBottomSheet(String id, GoogleApiClient mGoogleApiClient) {
-        Log.i(TAG, "addPhotoToBottomSheet: Hàm này đã được goi");
         new PhotoTask(viewPager.getWidth(), viewPager.getHeight()) {
             @Override
             protected void onPreExecute() {
@@ -251,7 +250,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 
                 // load image on viewpager, remove old images and add new ones.
                 if (attributedPhotos.size() > 0) {
-                    Log.i(TAG, "onPostExecute: có return image");
                     mArrayListAttributedPhoto = attributedPhotos;
                     ImagePagerAdapter imagePagerAdapter = new ImagePagerAdapter(getSupportFragmentManager(), attributedPhotos.size());
                     viewPager.setAdapter(imagePagerAdapter);

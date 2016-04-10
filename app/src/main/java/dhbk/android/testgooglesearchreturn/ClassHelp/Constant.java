@@ -14,6 +14,7 @@ public final class Constant {
     // draw on map
     public static final Float WIDTH_LINE = 20.0f;
     public static final int COLOR = 0x8001579B;
+    public static final String LANGUAGE = "vi";
 
     // map zoom
     public static final int ZOOM = 13;
