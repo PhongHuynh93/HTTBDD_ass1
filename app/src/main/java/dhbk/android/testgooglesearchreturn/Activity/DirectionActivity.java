@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -54,6 +55,7 @@ public class DirectionActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_direction);
 
+
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -61,7 +63,7 @@ public class DirectionActivity extends BaseActivity {
         makeMapDefaultSetting();
         mMapView = getMapView();
 
-        declareFab();
+        declareSearch();
 
         // set dest place
         if (MainActivity.mPlace != null) {
@@ -75,14 +77,25 @@ public class DirectionActivity extends BaseActivity {
         if (startPlace == null) {
             Location place = getLocation();
             setStartPlace(place);
+            Log.i(TAG, "onClick onCreate: " + MainActivity.mGoogleApiClient.isConnected());
+
         }
 
         declareBottomNavigation(savedInstanceState);
 
-        // TODO: 4/6/16 phong - test trường hợp 2 thanh search
     }
 
-    private void declareFab() {
+    public void onClickFab(View view) {
+        Log.i(TAG, "onClick: fab " + MainActivity.mGoogleApiClient.isConnected());
+        Location place = getLocation();
+        setStartPlace(place);
+        Log.i(TAG, "onClick: fab " + MainActivity.mGoogleApiClient.isConnected());
+        // change edit text
+        mStartPoint.setText(R.string.yourLocation);
+        drawNewPathOnTab();
+    }
+
+    private void declareSearch() {
         mStartPoint = (EditText) findViewById(R.id.start_point);
         assert mStartPoint != null;
         mStartPoint.setText(R.string.yourLocation);
@@ -106,6 +119,8 @@ public class DirectionActivity extends BaseActivity {
             }
         });
 
+        Log.i(TAG, "onClick: declareSearch " + MainActivity.mGoogleApiClient.isConnected());
+
     }
 
     // phong - khung chứa 4 icons phương tiện.
@@ -116,20 +131,29 @@ public class DirectionActivity extends BaseActivity {
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarItemRun) {
+                    MainActivity.mGoogleApiClient.connect();
+                    Log.i(TAG, "onClick: botnav " + MainActivity.mGoogleApiClient.isConnected());
+
                     mToolbar.setBackgroundColor(getResources().getColor(R.color.bot1));
                     drawNewPath(Constant.MODE_RUN);
 
                 } else if (menuItemId == R.id.bottomBarItemBike) {
+                    Log.i(TAG, "onClick: botnav " + MainActivity.mGoogleApiClient.isConnected());
+
                     mToolbar.setBackgroundColor(getResources().getColor(R.color.bot2));
                     drawNewPath(Constant.MODE_BIKE);
 
 
                 } else if (menuItemId == R.id.bottomBarItemBus) {
+                    Log.i(TAG, "onClick: botnav " + MainActivity.mGoogleApiClient.isConnected());
+
                     mToolbar.setBackgroundColor(getResources().getColor(R.color.bot3));
                     drawNewPath(Constant.MODE_BUS);
 
 
                 } else if (menuItemId == R.id.bottomBarItemCar) {
+                    Log.i(TAG, "onClick: botnav " + MainActivity.mGoogleApiClient.isConnected());
+
                     mToolbar.setBackgroundColor(getResources().getColor(R.color.bot4));
                     drawNewPath(Constant.MODE_CAR);
 
@@ -139,6 +163,8 @@ public class DirectionActivity extends BaseActivity {
             @Override
             public void onMenuTabReSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.bottomBarItemRun) {
+                    MainActivity.mGoogleApiClient.connect();
+
                     mToolbar.setBackgroundColor(getResources().getColor(R.color.bot1));
                     drawNewPath(Constant.MODE_RUN);
 
@@ -172,6 +198,28 @@ public class DirectionActivity extends BaseActivity {
         if (startPlace != null && destinationPlace != null) {
             mMapView.getOverlays().clear();
             drawPathOSMWithInstruction(startPlace, destinationPlace, mode, Constant.WIDTH_LINE);
+        }
+    }
+
+
+    // phong draw path depends on current tab
+    private void drawNewPathOnTab() {
+        switch (mBottomBar.getCurrentTabPosition()) {
+            case 0:
+                Log.i(TAG, "onActivityResult: bạn chon chạy");
+                drawNewPath(Constant.MODE_RUN);
+                break;
+            case 1:
+                drawNewPath(Constant.MODE_BIKE);
+                break;
+            case 2:
+                drawNewPath(Constant.MODE_BUS);
+                break;
+            case 3:
+                drawNewPath(Constant.MODE_CAR);
+                break;
+            default:
+                Log.i(TAG, "onActivityResult: error when choose tab");
         }
     }
 
@@ -214,24 +262,9 @@ public class DirectionActivity extends BaseActivity {
                 startPlace.setLatitude(place.getLatLng().latitude);
                 startPlace.setLongitude(place.getLatLng().longitude);
                 setStartPlace(startPlace);
+
                 //drawpath
-                switch (mBottomBar.getCurrentTabPosition()) {
-                    case 0:
-                        Log.i(TAG, "onActivityResult: bạn chon chạy");
-                        drawNewPath(Constant.MODE_RUN);
-                        break;
-                    case 1:
-                        drawNewPath(Constant.MODE_BIKE);
-                        break;
-                    case 2:
-                        drawNewPath(Constant.MODE_BUS);
-                        break;
-                    case 3:
-                        drawNewPath(Constant.MODE_CAR);
-                        break;
-                    default:
-                        Log.i(TAG, "onActivityResult: error when choose tab");
-                }
+                drawNewPathOnTab();
 
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
@@ -254,23 +287,7 @@ public class DirectionActivity extends BaseActivity {
                 setDestinationPlace(destPlace);
 
                 // draw path
-                switch (mBottomBar.getCurrentTabPosition()) {
-                    case 0:
-                        Log.i(TAG, "onActivityResult: bạn chon chạy");
-                        drawNewPath(Constant.MODE_RUN);
-                        break;
-                    case 1:
-                        drawNewPath(Constant.MODE_BIKE);
-                        break;
-                    case 2:
-                        drawNewPath(Constant.MODE_BUS);
-                        break;
-                    case 3:
-                        drawNewPath(Constant.MODE_CAR);
-                        break;
-                    default:
-                        Log.i(TAG, "onActivityResult: error when choose tab");
-                }
+                drawNewPathOnTab();
 
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
@@ -281,6 +298,7 @@ public class DirectionActivity extends BaseActivity {
             }
         }
     }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -298,4 +316,5 @@ public class DirectionActivity extends BaseActivity {
     public void setStartPlace(Location startPlace) {
         this.startPlace = startPlace;
     }
+
 }
