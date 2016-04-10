@@ -69,12 +69,10 @@ public class DirectionActivity extends BaseActivity {
             destinationPlace.setLongitude(MainActivity.mPlace.getLatLng().longitude);
         }
         startPlace = getLocation();
-        Log.i(TAG, "onCreate: startPlace " + startPlace);
 
         declareBottomNavigation(savedInstanceState);
 
         // TODO: 4/6/16 phong - test trường hợp 2 thanh search
-        Log.i(TAG, "onCreate: ..");
     }
 
     private void declareFab() {
@@ -170,7 +168,7 @@ public class DirectionActivity extends BaseActivity {
         if (startPlace != null && destinationPlace != null) {
             GeoPoint userCurrentPoint = new GeoPoint(startPlace.getLatitude(), startPlace.getLongitude());
             mMapView.getOverlays().clear();
-            drawPathOSM(startPlace, destinationPlace, mode, Constant.WIDTH_LINE);
+            drawPathOSMWithInstruction(startPlace, destinationPlace, mode, Constant.WIDTH_LINE);
 //            mMapView.getController().setCenter(userCurrentPoint);
 //            mMapView.getController().zoomTo(Constant.ZOOM);
         }
