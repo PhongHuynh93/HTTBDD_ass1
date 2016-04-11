@@ -17,6 +17,7 @@ public final class Constant {
     public static final Float WIDTH_LINE = 20.0f;
     public static final int COLOR = 0x8001579B;
     public static final String LANGUAGE = "vi";
-    public static final int ICON_INSTRUCTION = R.drawable.ic_explore_black_24dp;
+    public static final int ICON_INSTRUCTION = R.drawable.ic_near_me_black_24dp;
+    public static final int MARKER = R.drawable.ic_place_black_24dp;
     public static final int ZOOM = 14;
 }

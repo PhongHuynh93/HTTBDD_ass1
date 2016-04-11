@@ -35,6 +35,7 @@ import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
 
+import dhbk.android.testgooglesearchreturn.ClassHelp.Constant;
 import dhbk.android.testgooglesearchreturn.ClassHelp.ImagePagerAdapter;
 import dhbk.android.testgooglesearchreturn.ClassHelp.PhotoTask;
 import dhbk.android.testgooglesearchreturn.R;
@@ -88,7 +89,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                     mMapView.getOverlays().clear();
 
                     Location userCurrentLocation = getLocation();
-                    setMarkerAtLocation(userCurrentLocation, R.drawable.ic_face_black_24dp);
+                    setMarkerAtLocation(userCurrentLocation, Constant.MARKER);
                 } else {
                     Log.i(TAG, "onClick: GoogleApi not connect");
                 }
@@ -214,7 +215,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                 Location placeLocation = new Location("Test");
                 placeLocation.setLatitude(place.getLatLng().latitude);
                 placeLocation.setLongitude(place.getLatLng().longitude);
-                setMarkerAtLocation(placeLocation, R.drawable.ic_face_black_24dp);
+                setMarkerAtLocation(placeLocation, Constant.MARKER);
             }
 
             @Override
