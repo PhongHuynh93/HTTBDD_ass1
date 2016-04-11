@@ -31,6 +31,8 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
+import org.osmdroid.bonuspack.overlays.InfoWindow;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
@@ -86,7 +88,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                         return;
                     }
                     // when click, remove old maker, add new marker
-                    mMapView.getOverlays().clear();
+//                    mMapView.getOverlays().clear();
+                    clearMap();
 
                     Location userCurrentLocation = getLocation();
                     setMarkerAtLocation(userCurrentLocation, Constant.MARKER);
@@ -211,7 +214,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
                 }
 
                 // remove marker on the map, center at that point and add marker.
-                mMapView.getOverlays().clear();
+//                mMapView.getOverlays().clear();
+                clearMap();
                 Location placeLocation = new Location("Test");
                 placeLocation.setLatitude(place.getLatLng().latitude);
                 placeLocation.setLongitude(place.getLatLng().longitude);
@@ -272,6 +276,22 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.i(TAG, "onConnectionFailed: ");
+    }
+
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint p) {
+        InfoWindow.closeAllInfoWindowsOn(mMapView);
+        return true;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint p) {
+        clearMap();
+        Location touchLocation = new Location("touchLocation");
+        touchLocation.setLatitude(p.getLatitude());
+        touchLocation.setLongitude(p.getLongitude());
+        setMarkerAtLocation(touchLocation, Constant.MARKER);
+        return true;
     }
 
 }

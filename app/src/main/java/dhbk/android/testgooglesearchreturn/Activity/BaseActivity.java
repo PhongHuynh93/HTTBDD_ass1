@@ -26,6 +26,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
+import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
@@ -53,7 +55,7 @@ import dhbk.android.testgooglesearchreturn.R;
 /**
  * Created by huynhducthanhphong on 3/30/16.
  */
-public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MapEventsReceiver {
     private static final String TAG = BaseActivity.class.getName();
     private MapView mMapView;
     private IMapController mIMapController;
@@ -75,6 +77,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             navigationView.setNavigationItemSelectedListener(this);
         }
 
+        // add event overlay
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
+        mMapView.getOverlays().add(0, mapEventsOverlay);
     }
 
     // Phong - called when select 1 item in nav.
@@ -477,4 +482,22 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         }
     }
 
+    // event touch
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint p) {
+        return false;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint p) {
+        return false;
+    }
+
+    // clear map, but add eventlocation
+    public void clearMap() {
+        mMapView.getOverlays().clear();
+        // add event overlay
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
+        mMapView.getOverlays().add(0, mapEventsOverlay);
+    }
 }
