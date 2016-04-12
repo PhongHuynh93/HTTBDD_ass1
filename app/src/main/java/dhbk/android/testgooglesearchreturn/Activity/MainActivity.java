@@ -5,19 +5,18 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +37,7 @@ import org.osmdroid.views.MapView;
 import java.util.ArrayList;
 
 import dhbk.android.testgooglesearchreturn.ClassHelp.Constant;
+import dhbk.android.testgooglesearchreturn.ClassHelp.FetchAddressIntentService;
 import dhbk.android.testgooglesearchreturn.ClassHelp.ImagePagerAdapter;
 import dhbk.android.testgooglesearchreturn.ClassHelp.PhotoTask;
 import dhbk.android.testgooglesearchreturn.R;
@@ -57,6 +57,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     // place id obtains when search
     public static Place mPlace;
 
+    private AddressResultReceiver mResultReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +70,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
         mMapView = getMapView();
 
         viewPager = (ViewPager) findViewById(R.id.imageSlider);
+
+        // receive address at a location.
+        mResultReceiver = new AddressResultReceiver(new Handler());
 
         // declare google api
         buildGoogleApiClient();
@@ -287,11 +292,86 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     @Override
     public boolean longPressHelper(GeoPoint p) {
         clearMap();
+        // reverse location into address
+
+
+        // make search bar and bottom sheet contain address
+
+        // draw marker
         Location touchLocation = new Location("touchLocation");
         touchLocation.setLatitude(p.getLatitude());
         touchLocation.setLongitude(p.getLongitude());
         setMarkerAtLocation(touchLocation, Constant.MARKER);
+
+        // chuyen thanh address
+        startIntentService(touchLocation);
         return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+
+    /**
+     * Creates an intent, adds location data to it as an extra, and starts the intent service for
+     * fetching an address.
+     */
+    protected void startIntentService(Location touchLocation) {
+        if (mGoogleApiClient.isConnected()) {
+            // Create an intent for passing to the intent service responsible for fetching the address.
+            Intent intent = new Intent(this, FetchAddressIntentService.class);
+
+            // Pass the result receiver as an extra to the service.
+            intent.putExtra(Constant.RECEIVER, mResultReceiver);
+
+            // Pass the location data as an extra to the service.
+            intent.putExtra(Constant.LOCATION_DATA_EXTRA, touchLocation);
+
+            // Start the service. If the service isn't already running, it is instantiated and started
+            // (creating a process for it if needed); if it is running then it remains running. The
+            // service kills itself automatically once all intents are processed.
+            startService(intent);
+        }
+    }
+
+    /**
+     * Receiver for data sent from FetchAddressIntentService.
+     */
+    class AddressResultReceiver extends ResultReceiver {
+        public AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        /**
+         *  Receives data sent from FetchAddressIntentService
+         */
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            // Display the address string or an error message sent from the intent service.
+            String addressOutput = resultData.getString(Constant.RESULT_DATA_KEY);
+            displayAddressOutput(addressOutput);
+
+            // Show a toast message if an address was found.
+            if (resultCode == Constant.SUCCESS_RESULT) {
+                Log.i(TAG, "onReceiveResult: " + R.string.address_found);
+            }
+        }
+    }
+
+    private void displayAddressOutput(String addressOutput) {
+        Log.i(TAG, "displayAddressOutput: " + addressOutput);
     }
 
 }
