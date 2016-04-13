@@ -19,4 +19,8 @@ public final class Constant {
     public static final String LANGUAGE = "vi";
     public static final int ICON_INSTRUCTION = R.drawable.ic_explore_black_24dp;
     public static final int ZOOM = 14;
+
+    //
+    public static final String EXTRA_PROFILE_URL = "profile url";
+    public static final String EXTRA_SHARED_PREF = "shared pref";
 }
