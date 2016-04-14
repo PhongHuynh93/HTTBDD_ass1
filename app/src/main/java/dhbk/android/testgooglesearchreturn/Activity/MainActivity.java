@@ -10,14 +10,11 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -239,7 +236,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 
     // add a google photo to google image view.
     private void addPhotoToBottomSheet(String id, GoogleApiClient mGoogleApiClient) {
-        Log.i(TAG, "addPhotoToBottomSheet: Hàm này đã được goi");
         new PhotoTask(viewPager.getWidth(), viewPager.getHeight()) {
             @Override
             protected void onPreExecute() {
@@ -251,7 +247,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 
                 // load image on viewpager, remove old images and add new ones.
                 if (attributedPhotos.size() > 0) {
-                    Log.i(TAG, "onPostExecute: có return image");
                     mArrayListAttributedPhoto = attributedPhotos;
                     ImagePagerAdapter imagePagerAdapter = new ImagePagerAdapter(getSupportFragmentManager(), attributedPhotos.size());
                     viewPager.setAdapter(imagePagerAdapter);
