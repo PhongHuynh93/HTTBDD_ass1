@@ -32,7 +32,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import dhbk.android.testgooglesearchreturn.ClassHelp.ListTripActivity;
 import dhbk.android.testgooglesearchreturn.R;
 
 
@@ -216,13 +215,6 @@ public class ShareActivity extends BaseActivity {
     }
 
 
-    public void startGalleryActivity(View v) {
-        Intent intent = new Intent(this, ListTripActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("galleryLocation", GALLERY_LOCATION);
-        intent.putExtras(bundle);
-        startActivity(intent);
-    }
 
     public void startSaveRouteActivity(View v) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

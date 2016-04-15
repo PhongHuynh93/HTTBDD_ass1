@@ -49,15 +49,7 @@
         <activity
             android:name=".Activity.ShareActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ClassHelp.ListTripActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
         <activity
             android:name=".Activity.DirectionActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -76,10 +68,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
         <service
             android:name=".ClassHelp.FetchAddressIntentService"
-            android:exported="false"/>
-        <activity android:name=".Activity.SaveRouteActivity"></activity>
+            android:exported="false" />
+
+        <activity android:name=".Activity.SaveRouteActivity" />
+        <activity android:name=".Activity.SavedListTripActivity"></activity>
     </application>
 
 </manifest>
