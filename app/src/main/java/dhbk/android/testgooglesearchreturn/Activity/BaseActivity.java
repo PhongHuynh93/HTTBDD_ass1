@@ -25,6 +25,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
+import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.bonuspack.routing.Road;
@@ -51,7 +53,7 @@ import dhbk.android.testgooglesearchreturn.R;
 /**
  * Created by huynhducthanhphong on 3/30/16.
  */
-public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MapEventsReceiver {
     private static final String TAG = BaseActivity.class.getName();
     private MapView mMapView;
     private IMapController mIMapController;
@@ -72,6 +74,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         if (navigationView != null) {
             navigationView.setNavigationItemSelectedListener(this);
         }
+
+        // add event overlay
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
+        mMapView.getOverlays().add(0, mapEventsOverlay);
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Constant.EXTRA_SHARED_PREF, MODE_PRIVATE);
         String url = sharedPreferences.getString(Constant.EXTRA_PROFILE_URL, null);
         if (url != null){
@@ -87,8 +93,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            // Handle the Direction Activity
-            // Handle the Share Activity
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_gallery) {
             Intent intent = new Intent(this, ShareActivity.class);
@@ -478,4 +484,22 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         }
     }
 
+    // event touch
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint p) {
+        return false;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint p) {
+        return false;
+    }
+
+    // clear map, but add eventlocation
+    public void clearMap() {
+        mMapView.getOverlays().clear();
+        // add event overlay
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
+        mMapView.getOverlays().add(0, mapEventsOverlay);
+    }
 }

@@ -317,4 +317,18 @@ public class DirectionActivity extends BaseActivity {
         this.startPlace = startPlace;
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        MainActivity.mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (MainActivity.mGoogleApiClient.isConnected()) {
+            MainActivity.mGoogleApiClient.disconnect();
+        }
+    }
+
 }

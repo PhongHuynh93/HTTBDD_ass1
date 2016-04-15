@@ -29,7 +29,7 @@ public class ImageDetailFragment extends Fragment {
         return f;
     }
 
-    // Empty constructor, required as per Fragment docs
+    // Empty constructor, req uired as per Fragment docs
     public ImageDetailFragment() {
     }
 
