@@ -1,4 +1,4 @@
-package dhbk.android.testgooglesearchreturn;
+package dhbk.android.testgooglesearchreturn.ClassHelp;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,8 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
+
+import dhbk.android.testgooglesearchreturn.R;
 
 /**
  * Created by Thien Nhan on 3/31/2016.
@@ -31,7 +33,7 @@ public class ListTripActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(layoutManager);
 
-        RecyclerView.Adapter imageAdapter = new ListAdapter(sortFile(galleryFoler));
+        RecyclerView.Adapter imageAdapter = new ListImageAdapter(sortFile(galleryFoler));
         recyclerView.setAdapter(imageAdapter);
     }
 

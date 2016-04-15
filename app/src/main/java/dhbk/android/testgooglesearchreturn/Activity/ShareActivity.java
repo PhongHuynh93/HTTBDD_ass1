@@ -33,7 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import dhbk.android.testgooglesearchreturn.ListTripActivity;
+import dhbk.android.testgooglesearchreturn.ClassHelp.ListTripActivity;
 import dhbk.android.testgooglesearchreturn.R;
 
 
@@ -43,7 +43,7 @@ public class ShareActivity extends BaseActivity {
     private static final int ACTIVITY_CAMERA_APP = 0;
     // private static final String GALLERY_LOCATION = "tripGallery" + new SimpleDateFormat("ydM_Hms").format(new Date()); // name of the folder gallery
     //TODO: Nhân - đặt tên folder gallery hợp lí
-    private static final String GALLERY_LOCATION = "tripGallery2016313_232723";
+    private static final String GALLERY_LOCATION = "tripGallery";
     LocationManager locationManager;
     RoadManager roadManager = new OSRMRoadManager(this);
     ArrayList<GeoPoint> route;
@@ -187,7 +187,7 @@ public class ShareActivity extends BaseActivity {
 
             //setReductImageSize();
 
-//            RecyclerView.Adapter newImageAdapter= new ListAdapter(sortFile(galleryFoler));
+//            RecyclerView.Adapter newImageAdapter= new ListImageAdapter(sortFile(galleryFoler));
 //            recyclerView.swapAdapter(newImageAdapter,false);
         }
     }
@@ -218,6 +218,30 @@ public class ShareActivity extends BaseActivity {
         bundle.putString("galleryLocation", GALLERY_LOCATION);
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    public void startSaveRouteActivity(View v) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        } else {
+            locationManager.removeUpdates(locationListenerGPS);
+            Intent intent = new Intent(this, SaveRouteActivity.class);
+            startActivity(intent);
+            //TODO: Kiem tra thong tin lo trinh
+//            if(route.size()>2){
+//                Gson gson=new Gson();
+//                String routeJSON=gson.toJson(route);
+//                Bundle bundle=new Bundle();
+//                bundle.putString("routeJSON",routeJSON);
+//                Intent intent = new Intent(this, SaveRouteActivity.class);
+//                intent.putExtras(bundle);
+//                startActivity(intent);
+//            }else{
+//                Toast.makeText(this," Chua co thong tin lo trinh  ",Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+        }
+
     }
 
 

@@ -2,12 +2,12 @@ package dhbk.android.testgooglesearchreturn.Activity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -16,11 +16,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Places;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,7 +29,6 @@ import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Polyline;
-import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -80,6 +78,12 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         // add event overlay
         MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
         mMapView.getOverlays().add(0, mapEventsOverlay);
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Constant.EXTRA_SHARED_PREF, MODE_PRIVATE);
+        String url = sharedPreferences.getString(Constant.EXTRA_PROFILE_URL, null);
+        if (url != null){
+            ImageView image = (ImageView)findViewById(R.id.profile_pic);
+            Picasso.with(getApplicationContext()).load(url).into(image);
+        }
     }
 
     // Phong - called when select 1 item in nav.
@@ -91,8 +95,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         if (id == R.id.nav_camera) {
             // Handle the Direction Activity
             // Handle the Share Activity
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
 
         } else if (id == R.id.nav_gallery) {
             Intent intent = new Intent(this, ShareActivity.class);
