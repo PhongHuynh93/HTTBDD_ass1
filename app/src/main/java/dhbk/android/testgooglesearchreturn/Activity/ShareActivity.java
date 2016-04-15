@@ -23,7 +23,6 @@ import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
@@ -73,15 +72,20 @@ public class ShareActivity extends BaseActivity {
         /*Gallery*/
         createImageGallery(); //create gallery when onCreate
         /*Map*/
-        mMap = (MapView) findViewById(R.id.map);
-        mMap.setTileSource(TileSourceFactory.MAPNIK);
+        // Phong - use map on class BaseActivity.
+//        mMap = (MapView) findViewById(R.id.map);
+//        mMap.setTileSource(TileSourceFactory.MAPNIK);
+//
+//        mMap.setBuiltInZoomControls(true);
+//        mMap.setMultiTouchControls(true);
+//        mapController = mMap.getController();
+//        mapController.setZoom(18);
+//        GeoPoint startPoint = new GeoPoint(10.772241, 106.657676);
+//        mapController.setCenter(startPoint);
+        makeMapDefaultSetting();
+        mMap = getMapView();
+        mapController = getIMapController();
 
-        mMap.setBuiltInZoomControls(true);
-        mMap.setMultiTouchControls(true);
-        mapController = mMap.getController();
-        mapController.setZoom(18);
-        GeoPoint startPoint = new GeoPoint(10.772241, 106.657676);
-        mapController.setCenter(startPoint);
         route = new ArrayList<GeoPoint>();
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         mStart = new Marker(mMap);

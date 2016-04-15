@@ -21,7 +21,6 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONObject;
 
 import dhbk.android.testgooglesearchreturn.ClassHelp.Constant;
->>>>>>> master
 import dhbk.android.testgooglesearchreturn.R;
 
 /**

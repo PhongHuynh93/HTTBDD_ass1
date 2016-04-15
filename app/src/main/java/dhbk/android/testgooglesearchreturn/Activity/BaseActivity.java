@@ -93,8 +93,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            // Handle the Direction Activity
-            // Handle the Share Activity
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_gallery) {
             Intent intent = new Intent(this, ShareActivity.class);
