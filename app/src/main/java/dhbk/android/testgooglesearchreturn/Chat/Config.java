@@ -11,7 +11,7 @@ import com.firebase.client.Firebase;
 public class Config {
 
     // TODO: change this to your own Firebase URL
-    private static final String FIREBASE_URL = "https://android-chat-gds.firebaseio.com/";
+    private static final String FIREBASE_URL = "https://test-fb-phong093.firebaseio.com";
     private static final String FIREBASE_CHILD = "chat";
     private static final String FIREBASE_MAIL = "email";
     public static final String USER_MAIL = "user_mail";

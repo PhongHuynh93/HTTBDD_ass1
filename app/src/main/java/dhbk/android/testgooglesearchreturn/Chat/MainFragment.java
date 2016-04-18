@@ -28,7 +28,7 @@ import dhbk.android.testgooglesearchreturn.R;
 /**
  * created by Jhordan on 05/07/15.
  */
-public class MainFragment extends Fragment implements View.OnClickListener{
+public class MainFragment extends Fragment implements View.OnClickListener {
 
     public MainFragment() {
     }
@@ -63,65 +63,53 @@ public class MainFragment extends Fragment implements View.OnClickListener{
 
     }
 
-    private void setUpRecyclerView(RecyclerView recyclerView, ChatAdapter chatAdapter){
+    private void setUpRecyclerView(RecyclerView recyclerView, ChatAdapter chatAdapter) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(chatAdapter);
     }
 
-    private void initializeView(View rootView){
-
+    private void initializeView(View rootView) {
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         final ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-
         if (actionBar != null)
-            actionBar.setTitle(getString(R.string.app_name)+" - " + Config.getMail(getActivity()));
+            actionBar.setTitle(getString(R.string.app_name));
 
-        editTxtMessage = (EditText)rootView.findViewById(R.id.edit_txt_message);
+        editTxtMessage = (EditText) rootView.findViewById(R.id.edit_txt_message);
         recyclerViewChat = (RecyclerView) rootView.findViewById(R.id.recycler_view_chat);
-        ((FloatingActionButton)rootView.findViewById(R.id.button_sent)).setOnClickListener(this);
+        ((FloatingActionButton) rootView.findViewById(R.id.button_sent)).setOnClickListener(this);
 
 
-        chatAdapter = new ChatAdapter(chatList,idDevice);
+        chatAdapter = new ChatAdapter(chatList, idDevice);
         setUpRecyclerView(recyclerViewChat, chatAdapter);
         getChatMessages();
 
 
-
-
-
     }
 
-    private void getChatMessages(){
-
+    private void getChatMessages() {
         mFirebaseReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
                 if (dataSnapshot != null && dataSnapshot.getValue() != null) {
-
                     //Firebase - Convierte una respuesta en un objeto de tipo Chat
                     Chat model = dataSnapshot.getValue(Chat.class);
                     chatList.add(model);
                     recyclerViewChat.scrollToPosition(chatList.size() - 1);
                     chatAdapter.notifyItemInserted(chatList.size() - 1);
                 }
-
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
@@ -131,15 +119,12 @@ public class MainFragment extends Fragment implements View.OnClickListener{
         });
     }
 
-    private void getMessageToSent(){
-
+    private void getMessageToSent() {
         String message = editTxtMessage.getText().toString();
-        if(!message.isEmpty())
-            mFirebaseReference.push().setValue(new Chat(message,idDevice));
-
+        if (!message.isEmpty())
+            mFirebaseReference.push().setValue(new Chat(message, idDevice));
         editTxtMessage.setText("");
     }
-
 
     @Override
     public void onClick(View view) {
