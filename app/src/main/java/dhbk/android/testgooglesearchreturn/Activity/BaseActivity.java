@@ -80,8 +80,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         mMapView.getOverlays().add(0, mapEventsOverlay);
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Constant.EXTRA_SHARED_PREF, MODE_PRIVATE);
         String url = sharedPreferences.getString(Constant.EXTRA_PROFILE_URL, null);
-        if (url != null){
-            ImageView image = (ImageView)findViewById(R.id.profile_pic);
+        if (url != null) {
+            ImageView image = (ImageView) findViewById(R.id.profile_pic);
             Picasso.with(getApplicationContext()).load(url).into(image);
         }
     }
@@ -107,7 +107,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         } else if (id == R.id.facebook) {
             Intent intent = new Intent(this, FacebookLoginActivity.class);
             startActivity(intent);
+        } else if (id == R.id.chat) {
+            Intent intent = new Intent(this, dhbk.android.testgooglesearchreturn.Chat.LoginActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_share) {
+
 
         } else if (id == R.id.nav_send) {
 
@@ -366,7 +370,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
 
 
             // draw marker on the road
-            for (JSONObject step: stepsArrayObject) {
+            for (JSONObject step : stepsArrayObject) {
                 try {
                     // get lat/long of a step
                     JSONObject startLocation = step.getJSONObject("start_location");

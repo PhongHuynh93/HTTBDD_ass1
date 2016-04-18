@@ -11,4 +11,12 @@
     <dimen name="nav_header_vertical_spacing">16dp</dimen>
     <dimen name="nav_header_height">160dp</dimen>
     <dimen name="fab_margin_bottom">100dp</dimen>
+    <!--chat-->
+    <dimen name="image_height">100dp</dimen>
+    <dimen name="padding_login">16dp</dimen>
+    <dimen name="padding_login_middle">4dp</dimen>
+    <dimen name="top_image">64dp</dimen>
+    <dimen name="edit_text_padding">10dp</dimen>
+    <dimen name="card_corners">2dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
 </resources>

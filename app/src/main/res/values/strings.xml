@@ -17,4 +17,12 @@
     <string name="no_location_data_provided">No location data provided</string>
     <string name="service_not_available">Sorry, the service is not available</string>
     <string name="invalid_lat_long_used">Invalid latitude or longitude used</string>
+
+    <!--chat-->
+    <string name="hint_mail">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="login_progress_dialog">Login...</string>
+    <string name="welcome">Welcome! </string>
+    <string name="hello">Hello</string>
+    <string name="sent_message">Sent</string>
 </resources>
