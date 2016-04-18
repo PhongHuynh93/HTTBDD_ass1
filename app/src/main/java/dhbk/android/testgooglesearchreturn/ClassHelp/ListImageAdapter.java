@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.List;
 
 import dhbk.android.testgooglesearchreturn.R;
 
@@ -16,9 +17,9 @@ import dhbk.android.testgooglesearchreturn.R;
  * Created by Thien Nhan on 3/31/2016.
  */
 public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.ViewHolder> {
-    private File[] mImageFile;
+    private List<File> mImageFile;
 
-    public ListImageAdapter(File[] holderFile) {
+    public ListImageAdapter(List<File> holderFile) {
         mImageFile = holderFile;
     }
 
@@ -30,7 +31,7 @@ public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        File imageView = mImageFile[position];
+        File imageView = mImageFile.get(position);
         ImageView imgView = holder.getImageView();
 //        setReductImageSize(imgView, imageView.getAbsolutePath());
         Picasso.with(imgView.getContext()).load(imageView).into(imgView);
@@ -40,7 +41,7 @@ public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.View
 
     @Override
     public int getItemCount() {
-        return mImageFile.length;
+        return mImageFile.size();
     }
 
     //associate imageview and recycleview

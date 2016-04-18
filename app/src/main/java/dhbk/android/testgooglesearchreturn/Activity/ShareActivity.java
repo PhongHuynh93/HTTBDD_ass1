@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Polyline;
@@ -84,7 +86,7 @@ public class ShareActivity extends BaseActivity {
         makeMapDefaultSetting();
         mMap = getMapView();
         mapController = getIMapController();
-
+        mapController.setZoom(18);
         route = new ArrayList<GeoPoint>();
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         mStart = new Marker(mMap);
@@ -220,22 +222,23 @@ public class ShareActivity extends BaseActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         } else {
-            locationManager.removeUpdates(locationListenerGPS);
-            Intent intent = new Intent(this, SaveRouteActivity.class);
-            startActivity(intent);
+
+//            Intent intent = new Intent(this, SaveRouteActivity.class);
+//            startActivity(intent);
             //TODO: Kiem tra thong tin lo trinh
-//            if(route.size()>2){
-//                Gson gson=new Gson();
-//                String routeJSON=gson.toJson(route);
-//                Bundle bundle=new Bundle();
-//                bundle.putString("routeJSON",routeJSON);
-//                Intent intent = new Intent(this, SaveRouteActivity.class);
-//                intent.putExtras(bundle);
-//                startActivity(intent);
-//            }else{
-//                Toast.makeText(this," Chua co thong tin lo trinh  ",Toast.LENGTH_SHORT).show();
-//                return;
-//            }
+            if (route.size() > 2) {
+                locationManager.removeUpdates(locationListenerGPS);
+                Gson gson = new Gson();
+                String routeJSON = gson.toJson(route);
+                Bundle bundle = new Bundle();
+                bundle.putString("routeJSON", routeJSON);
+                Intent intent = new Intent(this, SaveRouteActivity.class);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, " Chua co thong tin lo trinh  ", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
 
     }
