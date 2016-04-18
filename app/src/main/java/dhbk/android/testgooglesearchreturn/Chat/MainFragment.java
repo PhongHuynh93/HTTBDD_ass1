@@ -4,11 +4,8 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,11 +66,11 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     }
 
     private void initializeView(View rootView) {
-        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        final ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (actionBar != null)
-            actionBar.setTitle(getString(R.string.app_name));
+//        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+//        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+//        final ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+//        if (actionBar != null)
+//            actionBar.setTitle(getString(R.string.app_name));
 
         editTxtMessage = (EditText) rootView.findViewById(R.id.edit_txt_message);
         recyclerViewChat = (RecyclerView) rootView.findViewById(R.id.recycler_view_chat);
