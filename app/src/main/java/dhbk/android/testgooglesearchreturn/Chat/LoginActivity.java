@@ -26,7 +26,6 @@ public class LoginActivity extends AppCompatActivity {
     public static final String AUTHEN = "authen";
 
 
-
     private Firebase mFirebaseReference;
     TextView txtEmail, txtPassword;
     private String mUsername;
@@ -42,11 +41,11 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        getAuthStateListener();
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        getAuthStateListener();
+//    }
 
 
     //    login
@@ -62,60 +61,83 @@ public class LoginActivity extends AppCompatActivity {
         txtPassword = (TextView) findViewById(R.id.edit_txt_pass);
     }
 
+//
+//    private void getAuthStateListener() {
+//        mFirebaseReference.addAuthStateListener(new Firebase.AuthStateListener() {
+//            @Override
+//            public void onAuthStateChanged(AuthData authData) {
+//                // user is logged in
+//                if (authData != null) {
+//                    mUsername = ((String) authData.getProviderData().get(Config.getFirebaseMail()));
+//                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                    intent.putExtra(Config.USER_MAIL, mUsername);
+//                    startActivity(intent);
+//                    Config.setMail(LoginActivity.this, mUsername);
+//                    Log.i(TAG, AUTHEN + "onAuthStateChanged: log in success");
+//                }
+//                // user is not logged in
+//                else {
+//                    Log.i(TAG, AUTHEN + "onAuthStateChanged: fail log in");
+//                    mUsername = null;
+//                }
+//            }
+//        });
+//    }
 
-    private void getAuthStateListener() {
-        mFirebaseReference.addAuthStateListener(new Firebase.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(AuthData authData) {
-                // user is logged in
-                if (authData != null) {
-                    mUsername = ((String) authData.getProviderData().get(Config.getFirebaseMail()));
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.putExtra(Config.USER_MAIL, mUsername);
-                    startActivity(intent);
-                    Config.setMail(LoginActivity.this, mUsername);
-                    Log.i(TAG, AUTHEN + "onAuthStateChanged: log in success");
-                }
-                // user is not logged in
-                else {
-                    Log.i(TAG, AUTHEN + "onAuthStateChanged: fail log in");
-                    mUsername = null;
-                }
-            }
-        });
-    }
-
+    // when click button
     private void firebaseLogin(final String email, final String password) {
         final ProgressDialog progressDialog = ProgressDialog.show(LoginActivity.this, null, getString(R.string.login_progress_dialog), true);
         mFirebaseReference.createUser(email, password, new Firebase.ValueResultHandler<Map<String, Object>>() {
             @Override
-            // dk thành công
+            // dk thành công-> đặt email, pass vào database
             public void onSuccess(Map<String, Object> result) {
-                progressDialog.dismiss();
-                mFirebaseReference.authWithPassword(email, password, null);
+                mFirebaseReference.authWithPassword(email, password, new Firebase.AuthResultHandler() {
+                    @Override
+                    public void onAuthenticated(AuthData authData) {
+                        // Authenticated successfully with payload authData
+                        // go to main chat
+                        progressDialog.dismiss();
+                        Log.i(TAG,AUTHEN +  "onAuthenticated: Đăng kí thành công");
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                    intent.putExtra(Config.USER_MAIL, mUsername);
+                        startActivity(intent);
+                    }
 
-                Toast.makeText(LoginActivity.this, "Successfully created user account with uid: " + result.get("uid"), Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onAuthenticationError(FirebaseError firebaseError) {
+                        progressDialog.dismiss();
+                        // Authenticated failed with error firebaseError
+                        Log.i(TAG, AUTHEN + " onAuthenticationError:  Đăng kí thất bại");
+
+                    }
+                });
+//                Toast.makeText(LoginActivity.this, "Successfully created user account with uid: " + result.get("uid"), Toast.LENGTH_SHORT).show();
             }
 
+            // dk that bai, do trung email
             @Override
             public void onError(FirebaseError firebaseError) {
                 // there was an error
-                progressDialog.dismiss();
-                mFirebaseReference.authWithPassword(email, password, null);
+                mFirebaseReference.authWithPassword(email, password, new Firebase.AuthResultHandler() {
+                    // neu đánh trúng email
+                    @Override
+                    public void onAuthenticated(AuthData authData) {
+                        progressDialog.dismiss();
+                        Log.i(TAG, AUTHEN + "onAuthenticated: Đăng nhập thành công");
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                    intent.putExtra(Config.USER_MAIL, mUsername);
+                        startActivity(intent);
+                    }
 
-                Toast.makeText(LoginActivity.this, "Error " + firebaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onAuthenticationError(FirebaseError firebaseError) {
+                        progressDialog.dismiss();
+                        Log.i(TAG, AUTHEN + " onAuthenticationError: Đăng nhập thất bại");
+                        Toast.makeText(LoginActivity.this, "Error " + firebaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
-//
-//            @Override
-//            public void onSuccess() {
-//                mFirebaseReference.authWithPassword(email, password, null);
-//            }
-//
-//            @Override
-//            public void onError(FirebaseError firebaseError) {
-//                mFirebaseReference.authWithPassword(email, password, null);
-//                progressDialog.dismiss();
-//            }
+
         });
 
     }
