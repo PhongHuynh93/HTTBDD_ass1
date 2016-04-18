@@ -1,0 +1,54 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="@dimen/padding_login">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/image_height"
+        android:scaleType="fitCenter"
+        android:src="@drawable/firebase" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/padding_login"
+        android:layout_marginRight="@dimen/padding_login"
+        android:layout_marginTop="@dimen/top_image"
+        android:orientation="vertical"
+        android:padding="@dimen/edit_text_padding">
+
+
+        <EditText
+            android:id="@+id/edit_txt_mail"
+            style="@style/Widget.EditText.Custom"
+            android:layout_marginBottom="@dimen/padding_login_middle"
+            android:hint="@string/hint_mail" />
+
+        <EditText
+            android:id="@+id/edit_txt_pass"
+            style="@style/Widget.EditText.Custom"
+            android:hint="@string/hint_password"
+            android:inputType="textPassword" />
+
+
+    </LinearLayout>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/button_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/top_image"
+        android:src="@drawable/entrar"
+        app:borderWidth="0dp"
+        app:pressedTranslationZ="8dp" />
+
+
+</LinearLayout>
