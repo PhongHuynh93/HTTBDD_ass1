@@ -7,9 +7,13 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="Import"/>
         <item
+            android:id="@+id/nav_tracking"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Tracking" />
+        <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery"/>
+            android:title="Saved Trip" />
         <item
             android:id="@+id/facebook"
             android:title="Facebook"/>

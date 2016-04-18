@@ -96,8 +96,12 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
 
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_tracking) {
             Intent intent = new Intent(this, ShareActivity.class);
+            startActivity(intent);
+
+        } else if (id == R.id.nav_gallery) {
+            Intent intent = new Intent(this, SavedListTripActivity.class);
             startActivity(intent);
 
         } else if (id == R.id.facebook) {
@@ -420,6 +424,29 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         return poly;
     }
 
+    private void centerMap(Location startPoint) {
+        mMapView.getController().setCenter(new GeoPoint(startPoint.getLatitude(), startPoint.getLongitude()));
+    }
+
+    // event touch
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint p) {
+        return false;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint p) {
+        return false;
+    }
+
+    // clear map, but add eventlocation
+    public void clearMap() {
+        mMapView.getOverlays().clear();
+        // add event overlay
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
+        mMapView.getOverlays().add(0, mapEventsOverlay);
+    }
+
     // phong - get json from URL
     private class GetDirection extends AsyncTask<Void, Void, String> {
         private final Location startPoint;
@@ -450,10 +477,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         }
     }
 
-    private void centerMap(Location startPoint) {
-        mMapView.getController().setCenter(new GeoPoint(startPoint.getLatitude(), startPoint.getLongitude()));
-    }
-
     // phong - get json from URL
     private class GetDirectionInstruction extends AsyncTask<Void, Void, String> {
         private final Location startPoint;
@@ -482,24 +505,5 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
                 centerMap(this.startPoint);
             }
         }
-    }
-
-    // event touch
-    @Override
-    public boolean singleTapConfirmedHelper(GeoPoint p) {
-        return false;
-    }
-
-    @Override
-    public boolean longPressHelper(GeoPoint p) {
-        return false;
-    }
-
-    // clear map, but add eventlocation
-    public void clearMap() {
-        mMapView.getOverlays().clear();
-        // add event overlay
-        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
-        mMapView.getOverlays().add(0, mapEventsOverlay);
     }
 }
