@@ -62,10 +62,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView txtMessage;
+
         public ViewHolder(View view) {
             super(view);
             txtMessage = (TextView) view.findViewById(R.id.txt_message);
         }
     }
 
+    @Override
+    public String toString() {
+        return "ChatAdapter{" +
+                "chatList=" + chatList +
+                ", mId='" + mId + '\'' +
+                '}';
+    }
 }

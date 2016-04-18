@@ -21,11 +21,7 @@ import java.util.List;
 
 import dhbk.android.testgooglesearchreturn.R;
 
-
-/**
- * created by Jhordan on 05/07/15.
- */
-public class MainFragment extends Fragment implements View.OnClickListener {
+public class MainFragment extends Fragment {
 
     public MainFragment() {
     }
@@ -44,7 +40,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         mFirebaseReference = Config.getFirebaseReference();
         chatList = new ArrayList<>();
         idDevice = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
-
     }
 
 
@@ -74,13 +69,16 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
         editTxtMessage = (EditText) rootView.findViewById(R.id.edit_txt_message);
         recyclerViewChat = (RecyclerView) rootView.findViewById(R.id.recycler_view_chat);
-        ((FloatingActionButton) rootView.findViewById(R.id.button_sent)).setOnClickListener(this);
-
+        ((FloatingActionButton) rootView.findViewById(R.id.button_sent)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getMessageToSent();
+            }
+        });
 
         chatAdapter = new ChatAdapter(chatList, idDevice);
         setUpRecyclerView(recyclerViewChat, chatAdapter);
         getChatMessages();
-
 
     }
 
@@ -89,7 +87,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (dataSnapshot != null && dataSnapshot.getValue() != null) {
-                    //Firebase - Convierte una respuesta en un objeto de tipo Chat
                     Chat model = dataSnapshot.getValue(Chat.class);
                     chatList.add(model);
                     recyclerViewChat.scrollToPosition(chatList.size() - 1);
@@ -123,8 +120,4 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         editTxtMessage.setText("");
     }
 
-    @Override
-    public void onClick(View view) {
-        getMessageToSent();
-    }
 }
