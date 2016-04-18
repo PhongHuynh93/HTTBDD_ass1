@@ -28,7 +28,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private Firebase mFirebaseReference;
     TextView txtEmail, txtPassword;
-    private String mUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,19 +37,10 @@ public class LoginActivity extends AppCompatActivity {
         Config.getFirebaseInitialize(this);
         mFirebaseReference = Config.getFirebaseReference();
         initializeView();
-
     }
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        getAuthStateListener();
-//    }
-
 
     //    login
     private void initializeView() {
-
         ((FloatingActionButton) findViewById(R.id.button_login)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,29 +50,6 @@ public class LoginActivity extends AppCompatActivity {
         txtEmail = (TextView) findViewById(R.id.edit_txt_mail);
         txtPassword = (TextView) findViewById(R.id.edit_txt_pass);
     }
-
-//
-//    private void getAuthStateListener() {
-//        mFirebaseReference.addAuthStateListener(new Firebase.AuthStateListener() {
-//            @Override
-//            public void onAuthStateChanged(AuthData authData) {
-//                // user is logged in
-//                if (authData != null) {
-//                    mUsername = ((String) authData.getProviderData().get(Config.getFirebaseMail()));
-//                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//                    intent.putExtra(Config.USER_MAIL, mUsername);
-//                    startActivity(intent);
-//                    Config.setMail(LoginActivity.this, mUsername);
-//                    Log.i(TAG, AUTHEN + "onAuthStateChanged: log in success");
-//                }
-//                // user is not logged in
-//                else {
-//                    Log.i(TAG, AUTHEN + "onAuthStateChanged: fail log in");
-//                    mUsername = null;
-//                }
-//            }
-//        });
-//    }
 
     // when click button
     private void firebaseLogin(final String email, final String password) {
@@ -99,7 +66,6 @@ public class LoginActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                         Log.i(TAG,AUTHEN +  "onAuthenticated: Đăng kí thành công");
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//                    intent.putExtra(Config.USER_MAIL, mUsername);
                         startActivity(intent);
                     }
 
@@ -111,7 +77,6 @@ public class LoginActivity extends AppCompatActivity {
 
                     }
                 });
-//                Toast.makeText(LoginActivity.this, "Successfully created user account with uid: " + result.get("uid"), Toast.LENGTH_SHORT).show();
             }
 
             // dk that bai, do trung email
@@ -125,7 +90,6 @@ public class LoginActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                         Log.i(TAG, AUTHEN + "onAuthenticated: Đăng nhập thành công");
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//                    intent.putExtra(Config.USER_MAIL, mUsername);
                         startActivity(intent);
                     }
 
