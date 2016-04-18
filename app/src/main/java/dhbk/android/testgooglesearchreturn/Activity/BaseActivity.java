@@ -107,8 +107,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         } else if (id == R.id.facebook) {
             Intent intent = new Intent(this, FacebookLoginActivity.class);
             startActivity(intent);
-        } else if (id == R.id.facebook) {
-            Intent intent = new Intent(this, FacebookLoginActivity.class);
+        } else if (id == R.id.chat) {
+            Intent intent = new Intent(this, dhbk.android.testgooglesearchreturn.Chat.LoginActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_share) {
 
