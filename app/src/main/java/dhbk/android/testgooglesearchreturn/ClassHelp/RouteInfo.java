@@ -8,16 +8,17 @@ public class RouteInfo {
     private String description;
     private String img;
     private String route;
-
+    private String time;
 
     public RouteInfo() {
     }
 
-    public RouteInfo(String name, String description, String img, String route) {
+    public RouteInfo(String name, String description, String img, String route, String time) {
         this.name = name;
         this.description = description;
         this.img = img;
         this.route = route;
+        this.time = time;
     }
 
     public String getRoute() {
@@ -27,6 +28,15 @@ public class RouteInfo {
     public void setRoute(String route) {
         this.route = route;
     }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
     public String getImg() {
         return img;
     }
