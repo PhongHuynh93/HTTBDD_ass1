@@ -1,8 +1,5 @@
 package dhbk.android.testgooglesearchreturn.Chat;
 
-/**
- * Created by Jhordan on 23/07/15.
- */
 public class Chat {
 
     private String message;
