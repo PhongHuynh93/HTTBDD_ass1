@@ -27,7 +27,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private Firebase mFirebaseReference;
-    TextView txtEmail, txtPassword;
+    private TextView txtEmail, txtPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
