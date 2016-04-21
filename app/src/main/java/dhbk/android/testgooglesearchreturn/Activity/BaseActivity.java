@@ -54,6 +54,7 @@ import java.util.Locale;
 
 import dhbk.android.testgooglesearchreturn.ClassHelp.Constant;
 import dhbk.android.testgooglesearchreturn.R;
+import dhbk.android.testgooglesearchreturn.Voice.AccentRemover;
 
 
 /**
@@ -197,27 +198,32 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             hereMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
             hereMarker.setIcon(ContextCompat.getDrawable(getApplication(), icon));
             final String instruction = "" + Html.fromHtml(title);
-            Log.i(TAG, "setMarkerAtLocation: " + Html.fromHtml(title));
+            final String instructionKhongDau = new AccentRemover().toUrlFriendly(instruction);
+//            Log.i(TAG, "setMarkerAtLocation: co dau " + instruction);
+            Log.i(TAG, "setMarkerAtLocation: khong dau " + instructionKhongDau);
 //            Log.i(TAG, "setMarkerAtLocation: " + Html.toHtml(Html.fromHtml(title)));
             hereMarker.setTitle(instruction);
-            hereMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(Marker marker, MapView mapView) {
-//                    speakOut(instruction);
-                    Log.i(TAG, "onMarkerClick: da click marker");
-                    // Create the text message with a string
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, instruction);
-                    sendIntent.setType("text/plain");
 
-// Verify that the intent will resolve to an activity
-                    if (sendIntent.resolveActivity(getPackageManager()) != null) {
-                        startActivity(sendIntent);
-                    }
-                    return true;
-                }
-            });
+            // send to google translate to speak
+//            hereMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+//                @Override
+//                public boolean onMarkerClick(Marker marker, MapView mapView) {
+////                    speakOut(instruction);
+//                    Log.i(TAG, "onMarkerClick: da click marker");
+//                    // Create the text message with a string
+//                    Intent sendIntent = new Intent();
+//                    sendIntent.setAction(Intent.ACTION_SEND);
+//                    sendIntent.putExtra(Intent.EXTRA_TEXT, instruction);
+//                    sendIntent.setType("text/plain");
+//
+//// Verify that the intent will resolve to an activity
+//                    if (sendIntent.resolveActivity(getPackageManager()) != null) {
+//                        startActivity(sendIntent);
+//                    }
+//                    return true;
+//                }
+//            });
+
             mMapView.getOverlays().add(hereMarker);
             mMapView.invalidate();
         } else {
