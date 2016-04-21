@@ -372,7 +372,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 
     private void displayAddressOutput(String addressOutput) {
         Log.i(TAG, "displayAddressOutput: " + addressOutput);
-        // TODO: 4/12/16 phong - make address on bottom bar.
+        // TODO: 4/12/16 phong - make address on bottom bar and on search view
     }
 
 }
