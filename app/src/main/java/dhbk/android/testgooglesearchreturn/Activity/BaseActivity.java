@@ -55,11 +55,13 @@ import java.util.Locale;
 import dhbk.android.testgooglesearchreturn.ClassHelp.Constant;
 import dhbk.android.testgooglesearchreturn.R;
 import dhbk.android.testgooglesearchreturn.Voice.AccentRemover;
+import dhbk.android.testgooglesearchreturn.Voice.VIetnameseSpeak;
 
 
 /**
  * Created by huynhducthanhphong on 3/30/16.
  */
+// TODO: 4/21/16 add single tap thì xóa marker
 public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MapEventsReceiver, TextToSpeech.OnInitListener {
     private static final String TAG = BaseActivity.class.getName();
     private MapView mMapView;
@@ -197,32 +199,31 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
 //            hereMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             hereMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
             hereMarker.setIcon(ContextCompat.getDrawable(getApplication(), icon));
-            final String instruction = "" + Html.fromHtml(title);
+            final String instructionNeedRemove = "" + Html.fromHtml(title);
+            
+            // remove a part of string
+            String instruction = instructionNeedRemove;
+            if (instruction.indexOf("\n\n") != -1) {
+                // it contains world
+                instruction = instructionNeedRemove.substring(0, instructionNeedRemove.indexOf("\n\n"));
+            }
+
             final String instructionKhongDau = new AccentRemover().toUrlFriendly(instruction);
-//            Log.i(TAG, "setMarkerAtLocation: co dau " + instruction);
+            Log.i(TAG, "setMarkerAtLocation: co dau " + instruction);
             Log.i(TAG, "setMarkerAtLocation: khong dau " + instructionKhongDau);
 //            Log.i(TAG, "setMarkerAtLocation: " + Html.toHtml(Html.fromHtml(title)));
             hereMarker.setTitle(instruction);
 
-            // send to google translate to speak
-//            hereMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-//                @Override
-//                public boolean onMarkerClick(Marker marker, MapView mapView) {
-////                    speakOut(instruction);
-//                    Log.i(TAG, "onMarkerClick: da click marker");
-//                    // Create the text message with a string
-//                    Intent sendIntent = new Intent();
-//                    sendIntent.setAction(Intent.ACTION_SEND);
-//                    sendIntent.putExtra(Intent.EXTRA_TEXT, instruction);
-//                    sendIntent.setType("text/plain");
-//
-//// Verify that the intent will resolve to an activity
-//                    if (sendIntent.resolveActivity(getPackageManager()) != null) {
-//                        startActivity(sendIntent);
-//                    }
-//                    return true;
-//                }
-//            });
+            // when click marker, speak instruction
+            hereMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker, MapView mapView) {
+                    marker.showInfoWindow();
+                    mapView.getController().animateTo(marker.getPosition());
+                    new VIetnameseSpeak(getApplicationContext(), instructionKhongDau).speak();
+                    return true;
+                }
+            });
 
             mMapView.getOverlays().add(hereMarker);
             mMapView.invalidate();
