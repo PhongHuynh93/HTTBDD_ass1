@@ -58,6 +58,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     public static Place mPlace;
 
     private AddressResultReceiver mResultReceiver;
+    private BottomSheetBehavior<View> bottomSheetBehavior;
+    private TextView placeName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +141,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 
         // bottom sheet
         View bottomSheetDetailPlace = findViewById(R.id.map_bottom_sheets);
-        final BottomSheetBehavior<View> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetDetailPlace);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetDetailPlace);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -170,7 +172,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
             }
         });
         // place details
-        final TextView placeName = (TextView) findViewById(R.id.place_name);
+        placeName = (TextView) findViewById(R.id.place_name);
         final TextView addressName = (TextView) findViewById(R.id.address_name);
         final TextView phoneName = (TextView) findViewById(R.id.phone_name);
         final TextView websiteName = (TextView) findViewById(R.id.website_name);
@@ -311,12 +313,14 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     @Override
     protected void onStart() {
         super.onStart();
+        Log.i(TAG, "Static google client " + " onStart: " + mGoogleApiClient);
         mGoogleApiClient.connect();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        Log.i(TAG, "Static google client " + "onStop: " +mGoogleApiClient);
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
@@ -372,7 +376,13 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 
     private void displayAddressOutput(String addressOutput) {
         Log.i(TAG, "displayAddressOutput: " + addressOutput);
-        // TODO: 4/12/16 phong - make address on bottom bar.
+        // TODO: 4/12/16 phong - make address on bottom bar and on search view
+        if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+            // add place details
+            placeName.setText(addressOutput);
+            bottomSheetBehavior.setPeekHeight(369);
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
     }
 
 }
