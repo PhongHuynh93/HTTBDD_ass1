@@ -1,12 +1,15 @@
 package dhbk.android.testgooglesearchreturn.Activity;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -14,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -44,7 +48,9 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import dhbk.android.testgooglesearchreturn.ClassHelp.Constant;
 import dhbk.android.testgooglesearchreturn.R;
@@ -53,10 +59,11 @@ import dhbk.android.testgooglesearchreturn.R;
 /**
  * Created by huynhducthanhphong on 3/30/16.
  */
-public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MapEventsReceiver {
+public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MapEventsReceiver, TextToSpeech.OnInitListener {
     private static final String TAG = BaseActivity.class.getName();
     private MapView mMapView;
     private IMapController mIMapController;
+    private TextToSpeech tts;
 
     public MapView getMapView() {
         return mMapView;
@@ -80,10 +87,13 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         mMapView.getOverlays().add(0, mapEventsOverlay);
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Constant.EXTRA_SHARED_PREF, MODE_PRIVATE);
         String url = sharedPreferences.getString(Constant.EXTRA_PROFILE_URL, null);
-        if (url != null){
-            ImageView image = (ImageView)findViewById(R.id.profile_pic);
+        if (url != null) {
+            ImageView image = (ImageView) findViewById(R.id.profile_pic);
             Picasso.with(getApplicationContext()).load(url).into(image);
         }
+
+        // google text to speech
+        tts = new TextToSpeech(this, this);
     }
 
     // Phong - called when select 1 item in nav.
@@ -107,7 +117,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         } else if (id == R.id.facebook) {
             Intent intent = new Intent(this, FacebookLoginActivity.class);
             startActivity(intent);
+        } else if (id == R.id.chat) {
+            Intent intent = new Intent(this, dhbk.android.testgooglesearchreturn.Chat.LoginActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_share) {
+
 
         } else if (id == R.id.nav_send) {
 
@@ -182,7 +196,28 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
 //            hereMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             hereMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
             hereMarker.setIcon(ContextCompat.getDrawable(getApplication(), icon));
-            hereMarker.setTitle(title);
+            final String instruction = "" + Html.fromHtml(title);
+            Log.i(TAG, "setMarkerAtLocation: " + Html.fromHtml(title));
+//            Log.i(TAG, "setMarkerAtLocation: " + Html.toHtml(Html.fromHtml(title)));
+            hereMarker.setTitle(instruction);
+            hereMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker, MapView mapView) {
+//                    speakOut(instruction);
+                    Log.i(TAG, "onMarkerClick: da click marker");
+                    // Create the text message with a string
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, instruction);
+                    sendIntent.setType("text/plain");
+
+// Verify that the intent will resolve to an activity
+                    if (sendIntent.resolveActivity(getPackageManager()) != null) {
+                        startActivity(sendIntent);
+                    }
+                    return true;
+                }
+            });
             mMapView.getOverlays().add(hereMarker);
             mMapView.invalidate();
         } else {
@@ -224,6 +259,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     }
 
     // phong - get JSON reponse from a URL
+    @NonNull
     private String getJSONFromUrl(String url) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -366,7 +402,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
 
 
             // draw marker on the road
-            for (JSONObject step: stepsArrayObject) {
+            for (JSONObject step : stepsArrayObject) {
                 try {
                     // get lat/long of a step
                     JSONObject startLocation = step.getJSONObject("start_location");
@@ -505,5 +541,54 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
                 centerMap(this.startPoint);
             }
         }
+    }
+
+    // google text to speech
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            int result = tts.setLanguage(Locale.US);
+            if (result == TextToSpeech.LANG_MISSING_DATA
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "This Language is not supported");
+            } else {
+//                speakOut();
+            }
+        } else {
+            Log.e("TTS", "Initilization Failed!");
+        }
+    }
+
+    private void speakOut(String text) {
+        Log.i(TAG, "speakOut: " + text);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ttsGreater21("Go to school");
+        } else {
+            ttsUnder20("Go to school");
+        }
+//        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    @SuppressWarnings("deprecation")
+    private void ttsUnder20(String text) {
+        HashMap<String, String> map = new HashMap<>();
+        map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, map);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void ttsGreater21(String text) {
+        String utteranceId = this.hashCode() + "";
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
+    }
+
+    @Override
+    public void onDestroy() {
+        // Don't forget to shutdown tts!
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
     }
 }
