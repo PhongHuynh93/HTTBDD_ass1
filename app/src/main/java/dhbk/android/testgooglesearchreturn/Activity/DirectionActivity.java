@@ -111,7 +111,7 @@ public class DirectionActivity extends BaseActivity {
             }
         });
 
-        Log.i(TAG, "onClick: declareSearch " + MainActivity.mGoogleApiClient.isConnected());
+        Log.i(TAG, "Ket noi ko " + "onClick: declareSearch " + MainActivity.mGoogleApiClient.isConnected());
 
     }
 
@@ -312,15 +312,21 @@ public class DirectionActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        Log.i(TAG, "Static google client " + "onStart: " + MainActivity.mGoogleApiClient);
         MainActivity.mGoogleApiClient.connect();
+        Log.i(TAG,  "Ket noi ko " + "onStart: " + MainActivity.mGoogleApiClient.isConnected());
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        Log.i(TAG, "Static google client " + "onStop: " + MainActivity.mGoogleApiClient);
+
         if (MainActivity.mGoogleApiClient.isConnected()) {
             MainActivity.mGoogleApiClient.disconnect();
         }
+
+        Log.i(TAG,  "Ket noi ko " + "onStop: " + MainActivity.mGoogleApiClient.isConnected());
     }
 
     @Override

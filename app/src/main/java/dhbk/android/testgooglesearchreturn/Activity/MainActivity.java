@@ -313,12 +313,14 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     @Override
     protected void onStart() {
         super.onStart();
+        Log.i(TAG, "Static google client " + " onStart: " + mGoogleApiClient);
         mGoogleApiClient.connect();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        Log.i(TAG, "Static google client " + "onStop: " +mGoogleApiClient);
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
