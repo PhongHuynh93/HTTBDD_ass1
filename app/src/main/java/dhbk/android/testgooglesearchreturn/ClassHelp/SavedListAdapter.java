@@ -5,6 +5,7 @@ import android.os.Environment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,11 +59,11 @@ public class SavedListAdapter extends RecyclerView.Adapter<SavedListAdapter.View
 
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(mContext, 1, LinearLayoutManager.HORIZONTAL, false);
         listImgView.setLayoutManager(layoutManager);
-        RecyclerView.Adapter imageAdapter = new ListImageAdapter(getFile(imgList));
+        RecyclerView.Adapter imageAdapter = new ListImageAdapter(getFile(imgList), null);
         listImgView.setAdapter(imageAdapter);
 
 
-        Picasso.with(imgView.getContext()).load(imgName).into(imgView);
+        Picasso.with(imgView.getContext()).load(imgName).resize(120, 120).into(imgView);
         nameView.setText(name);
         dateView.setText(date);
         descriptView.setText(descript);
@@ -92,7 +93,7 @@ public class SavedListAdapter extends RecyclerView.Adapter<SavedListAdapter.View
     }
 
     //associate imageview and recycleview
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
         private ImageView imageView;
         private TextView txtName, txtDate, txtDescript;
         private RecyclerView listImg;
@@ -104,6 +105,7 @@ public class SavedListAdapter extends RecyclerView.Adapter<SavedListAdapter.View
             txtDate = (TextView) v.findViewById(R.id.date);
             txtDescript = (TextView) v.findViewById(R.id.description);
             listImg = (RecyclerView) v.findViewById(R.id.listImg);
+            v.setOnCreateContextMenuListener(this);
 
         }
 
@@ -125,6 +127,13 @@ public class SavedListAdapter extends RecyclerView.Adapter<SavedListAdapter.View
 
         public TextView getTxtDescriptView() {
             return txtDescript;
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.setHeaderTitle("Select action");
+            menu.add(0, 0, 0, " Show map ");
+            menu.add(0, 1, 0, " Edit info ");
         }
     }
 }

@@ -1,5 +1,7 @@
 package dhbk.android.testgooglesearchreturn.ClassHelp;
 
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +20,11 @@ import dhbk.android.testgooglesearchreturn.R;
  */
 public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.ViewHolder> {
     private List<File> mImageFile;
+    private List<File> mSelectedImage;
 
-    public ListImageAdapter(List<File> holderFile) {
+    public ListImageAdapter(List<File> holderFile, List<File> selected) {
         mImageFile = holderFile;
+        mSelectedImage = selected;
     }
 
     @Override
@@ -31,10 +35,17 @@ public class ListImageAdapter extends RecyclerView.Adapter<ListImageAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        File imageView = mImageFile.get(position);
+        File image = mImageFile.get(position);
         ImageView imgView = holder.getImageView();
-//        setReductImageSize(imgView, imageView.getAbsolutePath());
-        Picasso.with(imgView.getContext()).load(imageView).into(imgView);
+
+        if (mSelectedImage != null) {
+            if (mSelectedImage.contains(image)) {
+                imgView.setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+            } else {
+                imgView.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY);
+            }
+        }
+        Picasso.with(imgView.getContext()).load(image).resize(195, 195).into(imgView);
 
     }
 
