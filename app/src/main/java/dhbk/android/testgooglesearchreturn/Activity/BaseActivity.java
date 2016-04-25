@@ -1,15 +1,13 @@
 package dhbk.android.testgooglesearchreturn.Activity;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Paint;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -32,12 +30,11 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.overlays.Marker;
-import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.bonuspack.routing.Road;
-import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.PathOverlay;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -48,22 +45,22 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import dhbk.android.testgooglesearchreturn.ClassHelp.Constant;
 import dhbk.android.testgooglesearchreturn.R;
+import dhbk.android.testgooglesearchreturn.Voice.AccentRemover;
+import dhbk.android.testgooglesearchreturn.Voice.VIetnameseSpeak;
 
 
 /**
  * Created by huynhducthanhphong on 3/30/16.
  */
-public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MapEventsReceiver, TextToSpeech.OnInitListener {
+// TODO: 4/21/16 add single tap thì xóa marker
+public abstract class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MapEventsReceiver {
     private static final String TAG = BaseActivity.class.getName();
     private MapView mMapView;
     private IMapController mIMapController;
-    private TextToSpeech tts;
 
     public MapView getMapView() {
         return mMapView;
@@ -91,9 +88,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             ImageView image = (ImageView) findViewById(R.id.profile_pic);
             Picasso.with(getApplicationContext()).load(url).into(image);
         }
-
-        // google text to speech
-        tts = new TextToSpeech(this, this);
     }
 
     // Phong - called when select 1 item in nav.
@@ -194,30 +188,34 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             Marker hereMarker = new Marker(mMapView);
             hereMarker.setPosition(userCurrentPoint);
 //            hereMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            hereMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+            hereMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             hereMarker.setIcon(ContextCompat.getDrawable(getApplication(), icon));
-            final String instruction = "" + Html.fromHtml(title);
-            Log.i(TAG, "setMarkerAtLocation: " + Html.fromHtml(title));
+            final String instructionNeedRemove = "" + Html.fromHtml(title);
+            
+            // remove a part of string
+            String instruction = instructionNeedRemove;
+            if (instruction.indexOf("\n\n") != -1) {
+                // it contains world
+                instruction = instructionNeedRemove.substring(0, instructionNeedRemove.indexOf("\n\n"));
+            }
+
+            final String instructionKhongDau = new AccentRemover().toUrlFriendly(instruction);
+            Log.i(TAG, "setMarkerAtLocation: co dau " + instruction);
+            Log.i(TAG, "setMarkerAtLocation: khong dau " + instructionKhongDau);
 //            Log.i(TAG, "setMarkerAtLocation: " + Html.toHtml(Html.fromHtml(title)));
             hereMarker.setTitle(instruction);
+
+            // when click marker, speak instruction
             hereMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker, MapView mapView) {
-//                    speakOut(instruction);
-                    Log.i(TAG, "onMarkerClick: da click marker");
-                    // Create the text message with a string
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, instruction);
-                    sendIntent.setType("text/plain");
-
-// Verify that the intent will resolve to an activity
-                    if (sendIntent.resolveActivity(getPackageManager()) != null) {
-                        startActivity(sendIntent);
-                    }
+                    marker.showInfoWindow();
+                    mapView.getController().animateTo(marker.getPosition());
+                    new VIetnameseSpeak(getApplicationContext(), instructionKhongDau).speak();
                     return true;
                 }
             });
+
             mMapView.getOverlays().add(hereMarker);
             mMapView.invalidate();
         } else {
@@ -340,8 +338,30 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             waypoints.add(destPoint);
 
             Road road = new Road(waypoints);
-            Polyline roadOverlay = RoadManager.buildRoadOverlay(road, Constant.COLOR, width, getApplicationContext());
-            mMapView.getOverlays().add(roadOverlay);
+
+//
+//            Polyline roadOverlay = RoadManager.buildRoadOverlay(road, Constant.COLOR, width, getApplicationContext());
+//            mMapView.getOverlays().add(roadOverlay);
+
+            //Lấy tọa độ tất cả các điểm neo
+            final ArrayList<GeoPoint> list = road.mRouteHigh;
+
+            final PathOverlay myPath = new PathOverlay(Constant.COLOR, getBaseContext());
+            Paint paint = myPath.getPaint();
+            paint.setStrokeWidth(width);
+            paint.setAlpha(150);
+            paint.setDither(true);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            paint.setStrokeJoin(Paint.Join.ROUND);
+            myPath.setPaint(paint);
+
+            // draw path
+            for (int i = 1; i < list.size(); i++) {
+                GeoPoint g = new GeoPoint(list.get(i).getLatitude(), list.get(i).getLongitude());
+                myPath.addPoint(g);
+            }
+            mMapView.getOverlays().add(myPath);
+
         }
         mMapView.invalidate();
     }
@@ -396,9 +416,30 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
             GeoPoint destPoint = new GeoPoint(destPlace.getLatitude(), destPlace.getLongitude());
             waypoints.add(destPoint);
 
+
             Road road = new Road(waypoints);
-            Polyline roadOverlay = RoadManager.buildRoadOverlay(road, Constant.COLOR, width, getApplicationContext());
-            mMapView.getOverlays().add(roadOverlay);
+//
+//            Polyline roadOverlay = RoadManager.buildRoadOverlay(road, Constant.COLOR, width, getApplicationContext());
+//            mMapView.getOverlays().add(roadOverlay);
+
+            //Lấy tọa độ tất cả các điểm neo
+            final ArrayList<GeoPoint> list = road.mRouteHigh;
+
+            final PathOverlay myPath = new PathOverlay(Constant.COLOR, getBaseContext());
+            Paint paint = myPath.getPaint();
+            paint.setStrokeWidth(width);
+            paint.setAlpha(150);
+            paint.setDither(true);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            paint.setStrokeJoin(Paint.Join.ROUND);
+            myPath.setPaint(paint);
+
+            // draw path
+            for (int i = 1; i < list.size(); i++) {
+                GeoPoint g = new GeoPoint(list.get(i).getLatitude(), list.get(i).getLongitude());
+                myPath.addPoint(g);
+            }
+            mMapView.getOverlays().add(myPath);
 
 
             // draw marker on the road
@@ -543,52 +584,4 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
         }
     }
 
-    // google text to speech
-    @Override
-    public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
-            int result = tts.setLanguage(Locale.US);
-            if (result == TextToSpeech.LANG_MISSING_DATA
-                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e("TTS", "This Language is not supported");
-            } else {
-//                speakOut();
-            }
-        } else {
-            Log.e("TTS", "Initilization Failed!");
-        }
-    }
-
-    private void speakOut(String text) {
-        Log.i(TAG, "speakOut: " + text);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            ttsGreater21("Go to school");
-        } else {
-            ttsUnder20("Go to school");
-        }
-//        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-    }
-
-    @SuppressWarnings("deprecation")
-    private void ttsUnder20(String text) {
-        HashMap<String, String> map = new HashMap<>();
-        map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
-        tts.speak(text, TextToSpeech.QUEUE_FLUSH, map);
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void ttsGreater21(String text) {
-        String utteranceId = this.hashCode() + "";
-        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
-    }
-
-    @Override
-    public void onDestroy() {
-        // Don't forget to shutdown tts!
-        if (tts != null) {
-            tts.stop();
-            tts.shutdown();
-        }
-        super.onDestroy();
-    }
 }

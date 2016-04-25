@@ -166,6 +166,7 @@
         app:backgroundTint="@color/colorBlue"
         app:layout_anchor="@id/map_bottom_sheets"
         app:layout_anchorGravity="top|start" />
+
     <!--here location fab-->
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_my_location"

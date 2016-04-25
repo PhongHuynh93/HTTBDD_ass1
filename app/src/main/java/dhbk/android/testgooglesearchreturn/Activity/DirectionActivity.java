@@ -5,13 +5,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -21,14 +15,12 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.common.server.converter.StringToIntConverter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
-import org.osmdroid.api.IMapController;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.bonuspack.overlays.InfoWindow;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
@@ -119,7 +111,7 @@ public class DirectionActivity extends BaseActivity {
             }
         });
 
-        Log.i(TAG, "onClick: declareSearch " + MainActivity.mGoogleApiClient.isConnected());
+        Log.i(TAG, "Ket noi ko " + "onClick: declareSearch " + MainActivity.mGoogleApiClient.isConnected());
 
     }
 
@@ -320,15 +312,34 @@ public class DirectionActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        Log.i(TAG, "Static google client " + "onStart: " + MainActivity.mGoogleApiClient);
         MainActivity.mGoogleApiClient.connect();
+        Log.i(TAG,  "Ket noi ko " + "onStart: " + MainActivity.mGoogleApiClient.isConnected());
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        Log.i(TAG, "Static google client " + "onStop: " + MainActivity.mGoogleApiClient);
+
         if (MainActivity.mGoogleApiClient.isConnected()) {
             MainActivity.mGoogleApiClient.disconnect();
         }
+
+        Log.i(TAG,  "Ket noi ko " + "onStop: " + MainActivity.mGoogleApiClient.isConnected());
+    }
+
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint p) {
+        Log.i(TAG, "singleTapConfirmedHelper: ");
+        InfoWindow.closeAllInfoWindowsOn(mMapView);
+        return true;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint p) {
+        Log.i(TAG, "longPressHelper: ");
+        return true;
     }
 
 }
