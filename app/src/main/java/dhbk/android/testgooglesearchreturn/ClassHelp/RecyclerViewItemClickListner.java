@@ -20,6 +20,8 @@ public class RecyclerViewItemClickListner implements RecyclerView.OnItemTouchLis
             public boolean onSingleTapUp(MotionEvent e) {
                 return true;
             }
+
+
         });
     }
 
@@ -27,7 +29,9 @@ public class RecyclerViewItemClickListner implements RecyclerView.OnItemTouchLis
     public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
         View childView = view.findChildViewUnder(e.getX(), e.getY());
         if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
+
             mListener.onItemClick(childView, view.getChildAdapterPosition(childView));
+
         }
         return false;
     }
@@ -43,5 +47,7 @@ public class RecyclerViewItemClickListner implements RecyclerView.OnItemTouchLis
 
     public interface OnItemClickListener {
         public void onItemClick(View view, int position);
+
     }
+
 }

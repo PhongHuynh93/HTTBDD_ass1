@@ -15,12 +15,9 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import dhbk.android.testgooglesearchreturn.ClassHelp.DBConnection;
@@ -29,13 +26,15 @@ import dhbk.android.testgooglesearchreturn.ClassHelp.RecyclerViewItemClickListne
 import dhbk.android.testgooglesearchreturn.ClassHelp.RouteInfo;
 import dhbk.android.testgooglesearchreturn.R;
 
-public class SaveRouteActivity extends AppCompatActivity {
+public class EditTripInfoActivity extends AppCompatActivity {
     private static final String GALLERY_FOLDER = "tripGallery";
     Button btnSave;
     EditText nameRoute, descript;
     RecyclerView recyclerView;
     ArrayList<String> arraySelectedFile;
     String route;
+    RouteInfo routeInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,44 +44,75 @@ public class SaveRouteActivity extends AppCompatActivity {
         descript = (EditText) findViewById(R.id.edtDescription);
         recyclerView = (RecyclerView) findViewById(R.id.recycleView);
         arraySelectedFile = new ArrayList<String>();
+
+        String id = getTripId();
+        routeInfo = getTripInfo(id);
+        nameRoute.setText(routeInfo.getName());
+        descript.setText(routeInfo.getDescription());
+        initRecycleView();
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                update();
+                Intent shareAcvitivy = new Intent(getApplicationContext(), SavedListTripActivity.class);
+                startActivity(shareAcvitivy);
+            }
+        });
+
+    }
+
+    private String getTripId() {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        route = bundle.getString("routeJSON");
+        String id = bundle.getString("id");
+        return id;
+    }
 
+    private RouteInfo getTripInfo(String id) {
+        DBConnection dbConnection = new DBConnection(this);
+        RouteInfo routeInfo = dbConnection.getTripInfo(id);
+        return routeInfo;
+    }
+
+    private List<File> getSavedImage() {
+        // lay danh sach hinh đã chọn
+        String imgList = routeInfo.getImg();
+        Gson gson = new Gson();
+        String[] img = gson.fromJson(imgList, String[].class);
+        List<File> list = new ArrayList<File>();
+        for (String each : img) {
+            String path = "/storage/emulated/0/DCIM/Camera/tripGallery/";
+            File file = new File(path + each);
+            list.add(file);
+        }
+        return list;
+    }
+
+    private void initRecycleView() {
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 1, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
-        RecyclerView.Adapter imageAdapter = new ListImageAdapter(sortFile(), null);
+        RecyclerView.Adapter imageAdapter = new ListImageAdapter(sortFile(), getSavedImage());
         recyclerView.setAdapter(imageAdapter);
         recyclerView.addOnItemTouchListener(
                 new RecyclerViewItemClickListner(getApplicationContext(), new RecyclerViewItemClickListner.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-
                         RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
-                        if (viewHolder.itemView.getAlpha() == 0.5) {
+                        if (viewHolder.itemView.getAlpha() == (float) 0.5) {
                             String deselectedFileName = getSelectedFileName(position);
                             arraySelectedFile.remove(deselectedFileName);
                             viewHolder.itemView.setAlpha((float) 1.0); // deselect item
+
                         } else {
                             String selectedFileName = getSelectedFileName(position);
                             arraySelectedFile.add(selectedFileName);
                             viewHolder.itemView.setAlpha((float) 0.5); //select item
+
+
                         }
-
                     }
-
-
                 })
         );
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveData();
-                Intent shareAcvitivy = new Intent(getApplicationContext(), ShareActivity.class);
-                startActivity(shareAcvitivy);
-            }
-        });
-
     }
 
     public String getSelectedFileName(int position) {
@@ -111,18 +141,23 @@ public class SaveRouteActivity extends AppCompatActivity {
         return list;
     }
 
-    private void saveData() {
-
+    private void update() {
         String name = nameRoute.getText().toString();
         String description = descript.getText().toString();
-        Gson gson = new Gson();
-        String img = gson.toJson(arraySelectedFile);
-        DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
-        Date dateobj = new Date();
-        String time = df.format(dateobj);
-        DBConnection dbConnection = new DBConnection(this);
-        dbConnection.addTrip(new RouteInfo(name, description, img, route, time));
-        Toast.makeText(SaveRouteActivity.this, "Save complete", Toast.LENGTH_SHORT).show();
-    }
+        if (arraySelectedFile.size() > 0) {
+            Gson gson = new Gson();
+            String img = gson.toJson(arraySelectedFile);
+            routeInfo.setImg(img);
+        }
 
+        DBConnection dbConnection = new DBConnection(this);
+        routeInfo.setName(name);
+        routeInfo.setDescription(description);
+
+
+        dbConnection.updateInfO(routeInfo);
+        Toast.makeText(EditTripInfoActivity.this, "Update complete", Toast.LENGTH_SHORT).show();
+
+
+    }
 }

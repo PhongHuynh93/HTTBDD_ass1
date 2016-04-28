@@ -9,6 +9,7 @@ public class RouteInfo {
     private String img;
     private String route;
     private String time;
+    private String id;
 
     public RouteInfo() {
     }
@@ -19,6 +20,14 @@ public class RouteInfo {
         this.img = img;
         this.route = route;
         this.time = time;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getRoute() {
